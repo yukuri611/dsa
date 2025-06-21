@@ -1,49 +1,28 @@
-#include <queue>
 #include <iostream>
 #include <unordered_set>
-
 #define LEN 10
 
-
 using namespace std;
-struct PairHash {
+
+struct pair_hash {
   template <class T1, class T2>
-  std::size_t operator () (const std::pair<T1, T2>& p) const {
+  size_t operator()(const pair<T1, T2>& p) const {
     auto h1 = hash<T1>{}(p.first);
     auto h2 = hash<T2>{}(p.second);
-    return h1^(h2 << 1);
+    return h1 ^ (h2 << 1);
   }
 };
 
-bool bfs(char (&grid)[LEN][LEN], int x, int y, int land_area) {
-  int dir[4][2] = {{0,1},{0,-1},{1,0},{-1,0}};
-  queue<pair<int, int>> q;
-  for (auto&[di, dj]: dir) {
-    int next_i = x + di;
-    int next_j = y + dj;
-    q.push({next_i, next_j});
+void dfs(int i, int j, char grid[LEN][LEN], unordered_set<pair<int, int>, pair_hash> &visited) {
+  int directions[4][2] = {{0,1}, {0,-1}, {1,0}, {-1,0}};
+  for (auto& dir: directions) {
+    int ni = i + dir[0];
+    int nj = j + dir[1];
+    if (0 <= ni && ni < LEN && 0 <= nj && nj < LEN && visited.count({ni, nj}) == 0 && grid[ni][nj] == 'o') {
+      visited.insert({ni, nj});
+      dfs(ni, nj, grid, visited);
+    }
   }
-  unordered_set<pair<int, int>, PairHash> visited;
-  
-  while (!q.empty()) {
-    if (visited.count(q.front())) {
-      q.pop();
-      continue;
-    }
-    auto& [i, j] = q.front();
-    if (i < 0 or i > LEN - 1 or j < 0 or j > LEN - 1 or grid[i][j] == 'x') {
-      q.pop();
-      continue;
-    }
-    visited.insert({i, j});
-    for (auto&[di, dj]: dir) {
-      int next_i = i + di;
-      int next_j = j + dj;
-      q.push({next_i, next_j});
-    }
-    q.pop();
-  }
-  return visited.size() == land_area;
 }
 
 int main() {
@@ -52,29 +31,24 @@ int main() {
   for (int i = 0; i < LEN; i++) {
     for (int j = 0; j < LEN; j++) {
       cin >> grid[i][j];
-      land_area += (grid[i][j] == 'o');
-    }
-  }
-  bool res = false;
-  for (int i = 0; i < LEN; i++) {
-    if (res) {
-      break;
-    }
-    for (int j = 0; j < LEN; j++) {
-      if (res) {
-        break;
-      }
-      if (grid[i][j] == 'x') {
-        res = bfs(grid, i, j, land_area);
+      if (grid[i][j] == 'o') {
+        land_area += 1;
       }
     }
   }
 
-  if (res) {
-    cout << "YES" << endl;
+  for (int i = 0; i < LEN; i++) {
+    for (int j = 0; j < LEN; j++) {
+      unordered_set<pair<int, int>, pair_hash> visited;
+      visited.insert({i,j});
+      dfs(i, j, grid, visited);
+      if (visited.size() == land_area + 1) {
+        cout << "YES" << endl;
+        return 0;
+      }
+    }
   }
-  else {
-    cout << "NO" << endl;
-  }
+  
+  cout << "NO" << endl;
   return 0;
 }
