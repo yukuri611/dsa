@@ -1,48 +1,47 @@
-#include <iostream>
 #include <vector>
-#include <queue>
+#include <iostream>
 
 using namespace std;
+
+int directions[8][2] = {{1,0}, {-1, 0}, {0,1}, {0,-1}, {1,1}, {1,-1}, {-1,1}, {-1,-1}};
+
+void dfs(int i, int j, vector<vector<int>> &grid, vector<vector<bool>> &visited) {
+  for (auto& dir: directions) {
+    int ni = i + dir[0];
+    int nj = j + dir[1];
+    if (0 <= ni && ni < grid.size() && 0 <= nj && nj < grid[0].size() && grid[ni][nj] == 1 && !visited[ni][nj]) {
+      visited[ni][nj] = true;
+      dfs(ni, nj, grid, visited);
+    }
+  }
+}
+
 int main() {
   int w, h;
   vector<int> res_list;
-
-  while (cin >> w >> h && (w != 0 || h != 0)) {
-    vector<vector<char>> grid(h, vector<char>(w,0));
+  while (true) {
+    cin >> w >> h;
+    if (w == 0 && h == 0) {
+      break;
+    }
+    vector<vector<int>> grid(h, vector<int>(w, 0));
     for (int i = 0; i < h; i++) {
       for (int j = 0; j < w; j++) {
         cin >> grid[i][j];
       }
     }
-    
-   
-    int res = 0;
-    int directions[8][2] = {{1,0}, {-1,0}, {0,1}, {0,-1}, {1,1}, {1,-1}, {-1,1}, {-1,-1}};
+    vector<vector<bool>> visited(h, vector<bool>(w, false));
+    int count = 0;
     for (int i = 0; i < h; i++) {
       for (int j = 0; j < w; j++) {
-        if (grid[i][j] == '1') {
-          queue<pair<int, int>> q;
-          q.push({i,j});
-          grid[i][j] = '2';
-          while (!q.empty()) {
-            pair<int, int> curr = q.front();
-            for (int k = 0; k < 8; k++) {
-              int ni = curr.first + directions[k][0];
-              int nj = curr.second + directions[k][1];
-
-              // Check bounds and if it's an unvisited '1'
-              if (ni >= 0 && ni < h && nj >= 0 && nj < w && grid[ni][nj] == '1') {
-                  grid[ni][nj] = '2'; // Mark as visited
-                  q.push({ni, nj});
-              }
-            }
-            q.pop();
-          }
-          res += 1;
+        if (grid[i][j] == 1 && !visited[i][j]) {
+          visited[i][j] = true;
+          dfs(i, j, grid, visited);
+          count += 1;
         }
       }
     }
-    res_list.push_back(res);
+    res_list.push_back(count);
   }
   for (int res: res_list) {
     cout << res << endl;
