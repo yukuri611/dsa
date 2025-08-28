@@ -1,20 +1,25 @@
 #include <iostream>
-#include <climits>
+#include <vector>
 
 using namespace std;
 
 int main() {
-  int A, B, C, X, Y;
-  cin >> A >> B >> C >> X >> Y;
-  
-  int res = INT_MAX;
-  for (int c = 1; c <= 2 * X && c <= 2 * Y; ++c) {
-    int a = X - c / 2;
-    int b = Y - c / 2;
-    int cost = a * A + b * B + c * C;
-    res = max(res, cost);
+  vector<int> res_list;
+  while (true) {
+    int n, x; cin >> n >> x;
+    if (n == 0 && x == 0) break;
+    int res = 0;
+    for (int i = 1; i <= n; ++i) {
+      for (int j = i + 1; j <= n; ++j) {
+        int k = x - i - j;
+        if (k > j && k <= n) res++;
+      }
+    
+    }
+    res_list.push_back(res);
   }
-
-  cout << res << endl;
+  for (int res: res_list) {
+    cout << res << endl;
+  }
   return 0;
 }
