@@ -1,33 +1,29 @@
 #include <iostream>
-#include <vector>
 #include <cmath>
+#include <vector>
 
 using namespace std;
 
-bool isPrime(int x) {
-  for (int i = 2; i <= sqrt(x); i++) {
-    if (!(x % i)) return false;
+bool isprime(int x) {
+  if (x == 2) return true;
+  for (int i = 2; i <= sqrt(x); ++i) {
+    if (x % i == 0) return false;
   }
   return true;
-}
+} 
+
 int main() {
-  vector<int> sum(100001, 0);
-  sum[3] = 1;
-  for (int i = 4;i < sum.size(); ++i) {
-    sum[i] = sum[i-1];
-    if (isPrime(i) && isPrime((i + 1)/2)) sum[i]++;
+  vector<int> count(100001, 0);
+  for (int i = 3; i < count.size(); ++i) {
+    if (isprime(i) && isprime((i + 1) / 2)) count[i]++;
+    count[i] += count[i-1];
   }
-
   int Q; cin >> Q;
-  
-  vector<int> res_list(Q);
-  for (int _ = 0; _ < Q; _++) {
+  vector<int> res(Q);
+  for (int i = 0; i < Q; ++i) {
     int l, r; cin >> l >> r;
-    int res = sum[r] - sum[l - 1];
-    res_list.push_back(res);
+    res[i] = count[r] - count[l - 1];
   }
-
-  for (int res: res_list) cout << res << endl;
+  for (int i = 0; i < Q; ++i) cout << res[i] << endl;
   return 0;
-
 }

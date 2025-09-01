@@ -1,37 +1,33 @@
-#include <iostream>
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
-struct Node {
-  int count;
-  vector<Node*> children;
-  Node(int count): count(count) {}
-};
-
-void dfs(Node &p, int x) {
-  p.count += x;
-  for (Node* child: p.children) {
-    dfs(*child, x);
+void dfs(vector<vector<int>> &tree, vector<long long> &counter, int v, int p) {
+  for(int child: tree[v]) {
+    if (child == p) continue; 
+    counter[child] += counter[v];
+    dfs(tree, counter, child, v);
   }
   return;
 }
+
 int main() {
   int N, Q; cin >> N >> Q;
-  vector<Node> tree(N + 1, Node(0));
-  for (int i = 0; i < N-1; ++i) {
+  vector<vector<int>> tree(N + 1);
+  for (int _ = 0; _ < N - 1; ++_) {
     int a, b; cin >> a >> b;
-    tree[a].children.push_back(&tree[b]);
+    tree[a].push_back(b);
+    tree[b].push_back(a);
+  }
+  vector<long long> counter(N + 1, 0);
+  for (int _ = 0; _ < Q; _++) {
+    long long p, x; cin >> p >> x;
+    counter[p] += x;
   }
 
-  for (int i = 0; i < Q; ++i) {
-    int p, x; cin >> p >> x;
-    dfs(tree[p], x);
-  }
-
-  for (int i = 1; i < N + 1; ++i) {
-    cout << tree[i].count << " ";
-  }
+  dfs(tree, counter, 1, -1);
+  for (int i = 1; i <= N; ++i) cout << counter[i] << " ";
   cout << endl;
   return 0;
 }
