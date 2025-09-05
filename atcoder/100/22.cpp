@@ -1,26 +1,25 @@
-#include <iostream>
-#include <cmath>
-#include <iomanip>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-
-// 元の関数 (計算完了までの時間)
 double f(double x, double P) {
-    return x + P * pow(2.0, -x / 1.5);
+  return x + P/pow(2, x/1.5);
+}
+
+double fprime(double x, double P) {
+  return 1 - P * log(2) / 1.5 * pow(2,-x/1.5);
 }
 
 int main() {
   double P; cin >> P;
-  
-  double l = 0, r = P;
-  while (r - l > pow(10, -8)) {
-    double c1 = (l + l + r) / 3;
-    double c2 = (l + r + r) / 3;
-    if (f(c1,P) > f(c2,P)) l = c1;
-    else r = c2;
+
+  double l, r; l = 0; r = P;
+  while ((r - l) > pow(10,-8)) {
+    double mid = (r - l) / 2 + l;
+    if (fprime(mid, P) < 0) l = mid;
+    else r = mid;
   }
 
-  cout << fixed << setprecision(10) << f(l, P) << endl;
+  cout << fixed << setprecision(9) << f(l, P) << endl;
   return 0;
 }

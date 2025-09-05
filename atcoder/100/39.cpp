@@ -1,27 +1,26 @@
-#include <iostream>
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
+using LL = long long;
 
 int main() {
   int N; cin >> N;
-  vector<int> nums(N-1);
-  int sum;
+  vector<int> nums(N - 1);
   for (int i = 0; i < N-1; ++i) cin >> nums[i];
-  cin >> sum;
+  int ans; cin >> ans;
 
-  vector<long long> dp(21,0);
-  dp[0] = 1;
-  for (int i = 0; i < nums.size(); ++i) {
-    vector<long long> nextDp(21,0);
+  vector<LL> dp(21, 0);
+  dp[nums[0]] = 1;
+  for (int i = 1; i < N - 1; ++i) {
+    vector<LL> nextDp(21,0);
+    int n = nums[i];
     for (int j = 0; j < 21; ++j) {
-      if (j + nums[i] < 21) nextDp[j + nums[i]] += dp[j];
-      if (j - nums[i] > -1) nextDp[j - nums[i]] += dp[j];
+      if (j - n >= 0) nextDp[j - n] += dp[j];
+      if (j + n < 21) nextDp[j + n] += dp[j];
     }
     dp = nextDp;
   }
 
-  cout << dp[sum] << endl;
+  cout << dp[ans] << endl;
   return 0;
-
 }

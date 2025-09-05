@@ -1,33 +1,32 @@
-#include <vector>
-#include <iostream>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-void dfs(vector<vector<int>> &tree, vector<long long> &counter, int v, int p) {
-  for(int child: tree[v]) {
-    if (child == p) continue; 
-    counter[child] += counter[v];
-    dfs(tree, counter, child, v);
+void dfs(int parent, int node, const vector<vector<int>> &tree, vector<int> &X) {
+  for (int child: tree[node]) {
+    if (child == parent) continue;
+    X[child] += X[node];
+    dfs(node, child, tree, X);
   }
-  return;
 }
 
 int main() {
   int N, Q; cin >> N >> Q;
   vector<vector<int>> tree(N + 1);
-  for (int _ = 0; _ < N - 1; ++_) {
+  for (int i = 0; i < N - 1; ++i) {
     int a, b; cin >> a >> b;
     tree[a].push_back(b);
     tree[b].push_back(a);
   }
-  vector<long long> counter(N + 1, 0);
-  for (int _ = 0; _ < Q; _++) {
-    long long p, x; cin >> p >> x;
-    counter[p] += x;
+  vector<int> X(N + 1, 0);
+  for (int i = 0; i < Q; ++i) {
+    int p, x; cin >> p >> x;
+    X[p] += x;
   }
 
-  dfs(tree, counter, 1, -1);
-  for (int i = 1; i <= N; ++i) cout << counter[i] << " ";
-  cout << endl;
+  dfs(-1, 1, tree, X);
+
+  for (int i = 1; i < N; ++i) cout << X[i] << " ";
+  cout << X[N] << endl;
   return 0;
 }

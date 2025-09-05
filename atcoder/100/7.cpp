@@ -1,54 +1,29 @@
-#include <iostream>
-#include <set>
-#include <vector>
-#include <cmath>
-#include <algorithm> // max を使うため
+#include <bits/stdc++.h>
 
 using namespace std;
 
 int main() {
-  int n;
-  cin >> n;
-  set<pair<int, int>> points;
-  // vectorに座標を保存しておくと、インデックスでのアクセスが簡単
-  vector<pair<int, int>> p_vec(n); 
+  int n; cin >> n;
+  vector<vector<int>> V(n, vector<int>(2));
+  set<pair<int, int>> S;
   for (int i = 0; i < n; ++i) {
-    cin >> p_vec[i].first >> p_vec[i].second;
-    points.insert(p_vec[i]);
+    int x, y; cin >> x >> y;
+    V[i] = {x,y};
+    S.insert({x,y});
   }
 
-  long long max_area = 0; // 面積は整数で、大きくなる可能性があるのでlong long
-
-  // 2つの点P1, P2を総当たりで選ぶ
+  int res = 0;
   for (int i = 0; i < n; ++i) {
-    for (int j = i + 1; j < n; ++j) {
-      // P1 = (x1, y1), P2 = (x2, y2)
-      int x1 = p_vec[i].first;
-      int y1 = p_vec[i].second;
-      int x2 = p_vec[j].first;
-      int y2 = p_vec[j].second;
-
-      // P1からP2へのベクトル(dx, dy)
-      int dx = x2 - x1;
-      int dy = y2 - y1;
-
-      // 残りの2頂点P3, P4の候補を計算
-      // ベクトル(dx, dy)を90度回転させると(-dy, dx)になる
-      pair<int, int> p3 = {x1 - dy, y1 + dx};
-      pair<int, int> p4 = {x2 - dy, y2 + dx};
-
-      // P3とP4が両方とも点の集合に存在するか確認
-      if (points.count(p3) && points.count(p4)) {
-        // 面積を計算（辺の長さの2乗）
-        long long area = (long long)dx * dx + (long long)dy * dy;
-        if (area > max_area) {
-          max_area = area;
-        }
-      }
+    for (int j = 0; j < n; ++j) {
+      if (i == j) continue;
+      int x1, x2, y1, y2; x1 = V[i][0]; x2 = V[j][0]; y1 = V[i][1]; y2 = V[j][1];
+      int x3, x4, y3, y4; 
+      x3 = x1 + y2 - y1; y3 = y1 + x1 - x2; x4 = x2 + y2 - y1; y4 = y2 + x1 - x2;
+      if (!S.count({x3,y3}) || !S.count({x4,y4})) continue;
+      int area = pow(x2 - x1, 2) + pow(y2 - y1, 2);
+      res = max(res, area);
     }
   }
-
-  cout << max_area << endl;
-
+  cout << res << endl;
   return 0;
 }
