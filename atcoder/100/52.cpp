@@ -4,40 +4,39 @@ using namespace std;
 
 int main() {
   int N, M; cin >> N >> M;
-  vector<int> A(N);
+  vector<int> T(N);
   for (int i = 0; i < N; ++i) {
     int doll; cin >> doll;
-    A[i] = doll - 1;
-  }
-  vector<vector<int>> count(M, vector<int>(N + 1,0)); //count[i][j] = 人形iのインデックスj-1までにある個数
-  for (int i = 0; i < N; ++i) {
-    for (int j = 0; j < M; ++j) {
-      count[j][i + 1] = count[j][i];
-    }
-    count[A[i]][i + 1]++;
+    --doll;
+    T[i] = doll;
   }
 
-  vector<int> pos((1 << M), 0);  //pos[mask] = maskに含まれる人形の総数
-  for (int mask = 0; mask < (1 << M); ++mask) {
-    for (int i = 0; i < M; ++i) {
-      if (mask & (1 << i)) {
-        pos[mask] += count[i][N];
-      }
+  vector<vector<int>> count(M, vector<int>(N + 1, 0)); //count[doll][i] = 0~i-1までに存在するdollの個数
+  for (int i = 1; i <= N; ++i) {
+    for (int doll = 0; doll < M; ++doll) {
+      if (T[i-1] == doll) count[doll][i] = count[doll][i-1] + 1;
+      else count[doll][i] = count[doll][i - 1];
     }
   }
-  
-  vector<int> dp((1 << M), 0);
-  for (int mask = 0; mask < (1 << M); ++mask) {
-    for (int new_doll = 0; new_doll < M; ++new_doll) {
-      if (mask & (1 << new_doll)) continue; //すでに並べてある。
-      int next_mask = mask | (1 << new_doll);
-      int start_pos = pos[mask];
-      int end_pos = pos[next_mask];
-      int kept_dolls = count[new_doll][end_pos] - count[new_doll][start_pos];
-      dp[next_mask] = max(dp[next_mask], dp[mask] + kept_dolls);
+  vector<int> len((1 << M), 0); //len[S] = 集合Sの長さ
+  for (int s = 1; s < (1 << M); ++s) {
+    for (int doll = 0; doll < M; ++doll) {
+      if ((s & (1 << doll)) == 0) continue;
+      len[s] += count[doll][N];
     }
   }
 
-  cout << N - dp[(1 << M) - 1] << endl;
+  vector<int> dp((1 << M), INT_MAX); //dp[S] = Sを並べるときに必要な最小取り除き数。
+  dp[0] = 0;
+  for (int S = 0; S < (1 << M); ++S) {
+    for (int newDoll = 0; newDoll < M; ++newDoll) {
+      if ((S & (1 << newDoll))) continue; //すでにnewdollが含まれる。
+      int nextS = S | (1 << newDoll); 
+      int remove_count = dp[S] + count[newDoll][N] - (count[newDoll][len[nextS]] - count[newDoll][len[S]]);
+      dp[nextS] = min(dp[nextS], remove_count);
+    }
+  }
+
+  cout << dp[(1 << M) - 1] << endl;
   return 0;
 }
