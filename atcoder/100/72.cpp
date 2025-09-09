@@ -27,34 +27,28 @@ LL power(LL a, LL n) {
 //   return power(n, mod - 2);
 // }
 
-LL inverse(LL n, ) {
-
-
+LL extGCD(LL a, LL b, LL &x, LL &y) {
+  if (b == 0) {
+    x = 1;
+    y = 0;
+    return a;
+  }
+  LL d = extGCD(b, a % b, x, y);
+  LL nextX = y;
+  LL nextY = x - a/b * y;
+  x = nextX;
+  y = nextY;
+  return d;
 }
 
-long long modinv(long long a, long long m) {
-  //法をmとしたときのaの逆元を返す関数
-	long long b = m, u = 1, v = 0;
-  // a * u + b * v = a となるようにキープ
-	while (b) {
-		long long t = a / b;
-		a -= t * b; //a = aをbで割ったあまり
-    swap(a, b); // a = b, b = rになる。（ユークリッドの互除法）
-		u -= t * v; 
-    swap(u, v);
-	}
-	u %= m; 
-	if (u < 0) u += m;
-	return u;
+LL inverse(LL n) {
+  //拡張ユークリッドの互除法を使用
+  LL x;
+  LL y;
+  extGCD(n, mod, x, y);
+  if (x < 0) x += mod;
+  return x;
 }
-
-int main() {
-	// mod. 13 での逆元を求めてみる
-	for (int i = 1; i < 13; ++i) {
-		cout << i << " 's inv: " << modinv(i, 13) << endl;
-	}
-}
-
 
 LL combination(LL n, LL r) {
   LL a = factorial(n);
