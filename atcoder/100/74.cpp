@@ -2,48 +2,51 @@
 
 using namespace std;
 using LL = long long;
+int mod = 1e9 + 7;
 
-LL mod = 1e9 + 7;
-
-LL factorial(LL n) {
-  LL res = 1;
-  for (int i = n; i > 0; --i) res = (res * i) % mod;
-  return res;
-}
-
-void extGCD(LL a, LL b, LL &x, LL &y) {
+int extGCD(int a, int b, LL &x, LL &y, int c) {
   if (b == 0) {
-    x = 1;
-    y = 0;
-    return;
+    if (c % a != 0) return -1;
+    x = c / a;
+    y = 0; 
+    return a;
   }
-  extGCD(b, a % b, x, y);
+  int d = extGCD(b, a % b, x, y, c);
+
   LL nextX = y;
-  LL nextY = x - (a / b) * y;
-  x = nextX;
-  y = nextY;
+  LL nextY = x - (a / b * nextX) % mod;
+  x = nextX; y = nextY;
+  return d;
 }
 
-LL inverse(LL n) {
+int inverse (int a) {
   LL x, y;
-  extGCD(n, mod, x, y);
+  extGCD(a, mod, x, y, 1);
   if (x < 0) x += mod;
   return x;
 }
-LL combination(int n, int k) {
-  LL a = factorial(n);
-  LL b = factorial(n - k);
-  LL c = factorial(k);
-  return (a * inverse((b * c % mod))) % mod;
+
+int factorial(int n) {
+  LL res = 1; 
+  for (int i = 2; i <= n; ++i) {
+    res = (res * i) % mod;
+  }
+  return res;
 }
 
-LL Homogenous(int n, int k) {
-  return combination(n + k - 1, k);
+int Combination(int n, int k) {
+  int a = factorial(n);
+  int b = factorial(n - k);
+  int c = factorial(k);
+  return (1LL * a * inverse((1LL * b * c) % mod)) % mod;
+}
+
+int Homogenous(int n, int k) {
+  return Combination(n - 1 + k, k);
 }
 
 int main() {
   int n, k; cin >> n >> k;
-  LL res = Homogenous(n,k) % mod;
-  cout << res << endl;
+  cout << Homogenous(n, k) << endl;
   return 0;
 }

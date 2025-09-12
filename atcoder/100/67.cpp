@@ -3,77 +3,83 @@
 using namespace std;
 using LL = long long;
 
-struct Edge {
-  int u, v;
-  int cost;
-  Edge(int u, int v, int cost) : u(u), v(v), cost(cost) {}
+struct Edge{
+  int u, v, w;
+  Edge(int u, int v, int w) : u(u), v(v), w(w) {}
+  bool operator>(const Edge& e) const{
+    return w > e.w;
+  }
 };
 
-class UnionFind {
-public:
+class UnionFind{
   vector<int> parent, rank;
-  UnionFind(int n) : parent(n), rank(n,0) {
+public:
+  UnionFind(int n) : parent(n), rank(n, 0){
     iota(parent.begin(), parent.end(), 0);
   }
-
-  int find(int n) {
-    if (parent[n] != n) {
-      parent[n] = find(parent[n]);
-    }
-    return parent[n];
+  int find(int a) {
+    if (parent[a] != a) parent[a] = find(parent[a]);
+    return parent[a];
   }
 
   void unite(int a, int b) {
-    int pa = find(a); int pb = find(b);
-    if (pa == pb) return;
-    if (rank[pa] < rank[pb]) {
-      parent[pa] = pb;
+    int rootA = find(a);
+    int rootB = find(b);
+    if (rootA == rootB) return;
+    if (rank[rootB] > rank[rootA]) {
+      parent[rootA] = rootB;
     }
     else {
-      parent[pb] = pa;
-      if (rank[pa] == rank[pb]) rank[pa]++;
+      parent[rootB] = rootA;
+      if(rank[rootA] == rank[rootB]) {
+        rank[rootA]++;
+      }
     }
+  }
+
+  bool same(int a, int b) {
+    return find(a) == find(b);
   }
 };
 
-LL kruscal(int N, vector<Edge> edges) {
-  UnionFind uf(N);
-  sort(edges.begin(), edges.end(), [&](Edge a, Edge b){return a.cost < b.cost;});
-  int edge_count = 0;
-  LL total_cost = 0;
-  for (Edge edge: edges) {
-    int u,v,cost; u = edge.u; v = edge.v; cost = edge.cost;
-    if (uf.find(u) == uf.find(v)) continue;
-    uf.unite(u, v);
-    total_cost += cost;
-    edge_count++;
-    if (edge_count == N - 1) break;
-  }
-  return total_cost;
-}
 int main() {
   int N; cin >> N;
-  vector<int> x(N), y(N);
-  for (int i = 0; i < N; ++i) cin >> x[i] >> y[i];
+  vector<int> X(N), Y(N);
+  for (int i = 0; i < N; ++i) cin >> X[i] >> Y[i];
 
-  vector<Edge> edges;
-  vector<int> ids(N);
-  iota(ids.begin(), ids.end(), 0);
-  sort(ids.begin(), ids.end(), [&](int i, int j) {return x[i] < x[j];});
-  for (int i = 0; i < ids.size() - 1; ++i) {
-    int u = ids[i]; int v = ids[i+1]; int cost = abs(x[u] - x[v]);
-    edges.push_back(Edge(u, v, cost));
+  priority_queue<Edge, vector<Edge>, greater<Edge>> pq;
+  vector<int> id(N);
+  //xによって追加
+  iota(id.begin(), id.end(), 0);
+  sort(id.begin(), id.end(), [&X](int i, int j){return X[i] < X[j];});
+  for (int i = 0; i < N - 1; ++i) {
+    int u = id[i]; int v= id[i + 1];
+    int w = X[v] - X[u];
+    pq.push(Edge(u,v,w));
+  }
+  //yによって追加
+  iota(id.begin(), id.end(), 0);
+  sort(id.begin(), id.end(), [&Y](int i, int j){return Y[i] < Y[j];});
+  for (int i = 0; i < N - 1; ++i) {
+    int u = id[i]; int v= id[i + 1];
+    int w = Y[v] - Y[u];
+    pq.push(Edge(u,v,w));
   }
 
-  iota(ids.begin(), ids.end(), 0);
-  sort(ids.begin(), ids.end(), [&](int i, int j) {return y[i] < y[j];});
-  for (int i = 0; i < ids.size() - 1; ++i) {
-    int u = ids[i]; int v = ids[i+1]; int cost = abs(y[u] - y[v]);
-    edges.push_back(Edge(u, v, cost));
+  UnionFind uf(N);
+  LL res = 0;
+  int count = 0;
+  while(!pq.empty()) {
+    Edge e = pq.top();
+    pq.pop();
+    if (uf.same(e.u, e.v)) continue;
+    uf.unite(e.u, e.v);
+    res += e.w;
+    count++;
+    if (count == N-1) break;
   }
 
-  LL res = kruscal(N, edges);
   cout << res << endl;
-
   return 0;
+
 }

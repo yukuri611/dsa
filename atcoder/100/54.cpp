@@ -2,23 +2,22 @@
 
 using namespace std;
 
-int LIS(vector<int> &C) {
-  vector<int> dp;
+int LIS(vector<int> C) {
+  vector<int> L;
   for (int c: C) {
-    auto it = upper_bound(dp.begin(), dp.end(),c);
-    if (it == dp.end()) dp.push_back(c);
+    auto it = lower_bound(L.begin(), L.end(), c);
+    if (it == L.end()) L.push_back(c);
     else *it = c;
   }
-  return dp.size();
+  return L.size();
 }
 
 int main() {
   int N; cin >> N;
   vector<int> C(N);
-  for (int i = 0; i < N; ++i) {
+  for (int i = 0;i < N; ++i) {
     cin >> C[i];
   }
-
   int res = N - LIS(C);
   cout << res << endl;
   return 0;

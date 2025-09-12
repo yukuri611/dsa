@@ -2,20 +2,21 @@
 
 using namespace std;
 using LL = long long;
+
 int main() {
   int N; cin >> N;
-  vector<vector<LL>> A(N+1, vector<LL>(N+1));
-  for (int i = 1; i <= N; ++i) {
-    for (int j = 1; j <= N; ++j) {
-      cin >> A[i][j];
+  vector<vector<LL>> D(N, vector<LL>(N));
+  for (int i = 0; i < N; ++i) {
+    for (int j = 0; j < N; ++j) {
+      cin >> D[i][j];
     }
   }
 
-  bool valid = true;
-  for (int k = 1; k <= N; ++k) {
-    for (int i = 1; i <= N; ++i) {
-      for (int j = 1; j <= N; ++j) {
-        if (A[i][j] > A[i][k] + A[k][j]) {
+  //存在するかどうかの判定
+  for (int i = 0; i < N; ++i) {
+    for (int j = 0; j < N; ++j) {
+      for (int k = 0; k < N; ++k) {
+        if (D[i][k] + D[k][j] < D[i][j]) {
           cout << -1 << endl;
           return 0;
         }
@@ -23,21 +24,27 @@ int main() {
     }
   }
 
-  LL res=0;
-  for (int i = 1; i <= N; ++i) {
-    for (int j = i+1; j <= N; ++j) {
-      bool need = true;
-      for (int k = 1; k <= N; ++k) {
-        if (k == i || k == j) continue;
-        if (A[i][k] + A[k][j] == A[i][j]) {
-          need = false;
+  //どれだけの道を削減することができるか
+  vector<vector<bool>> canBreak(N, vector<bool>(N, false));
+
+  for (int i = 0; i < N; ++i) {
+    for (int j = i + 1; j < N; ++j) {
+      for (int k = 0; k < N; ++k) {
+        if (i == k || j == k) continue;
+        if (D[i][k] + D[k][j] == D[i][j]) {
+          canBreak[i][j] = true;//橋を破壊
           break;
-        } 
+        }
       }
-      if (need) res += A[i][j];
     }
   }
 
-  cout << res << endl;
+  LL sum = 0;
+  for (int i = 0; i < N; ++i) {
+    for (int j = i + 1; j < N; ++j) {
+      if (!canBreak[i][j]) sum += D[i][j];
+    }
+  }
+  cout << sum << endl;
   return 0;
 }

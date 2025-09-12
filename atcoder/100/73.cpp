@@ -1,73 +1,49 @@
 #include <bits/stdc++.h>
+
 using namespace std;
-
 using LL = long long;
-LL mod = 1e9 + 7;
+int mod = 1000000007;
 
-LL factorial(LL n) {
+int power(LL a, int n) {
   LL res = 1;
-  for (int i = n; i > 0; --i) {
+  while(n > 0) {
+    if (n & 1) res = (res * a) % mod;
+    a = (a * a) % mod;
+    n >>= 1;
+  }
+  return res;
+}
+
+int inverse(int a) {
+  return power(a, mod - 2);
+}
+
+int factorial(int n) {
+  LL res = 1;
+  for (int i = 2; i <= n; ++i) {
     res = (res * i) % mod;
   }
   return res;
 }
 
-// LL power(LL a, LL n) {
-//   LL res = 1;
-//   while(n) {
-//     if (n & 1) res = (res * a) % mod;
-//     a = (a * a) % mod;
-//     n >>= 1;
-//   }
-//   return res;
-// }
-
-// LL inverse(LL a) {
-//   return power(a, mod - 2);
-// }
-
-void extGCD(LL a, LL b, LL &x, LL &y) {
-  if (b == 0) {
-    x = 1;
-    y = 0;
-    return;
-  }
-  extGCD(b, a % b, x, y);
-  LL nextX = y;
-  LL nextY = x - a / b * nextX;
-  x = nextX;
-  y = nextY;
+int combination(int x, int y) {
+  int a = factorial(x);
+  int b = factorial(x-y);
+  int c = factorial(y);
+  return (1LL * a * inverse((1LL * b * c) % mod)) % mod;
 }
-
-LL inverse(LL a) {
-  LL x;
-  LL y;
-  extGCD(a, mod, x, y);
-  if (x < 0) x += mod;
-  return x;
-}
-
-LL combination(LL n, LL k) {
-  LL a = factorial(n);
-  LL b = factorial(n - k);
-  LL c = factorial(k);
-  return (a * inverse((b * c) % mod)) % mod;
-}
-
 
 int main() {
   int X, Y; cin >> X >> Y;
-  if ((2 * Y - X) % 3 != 0) {
+  if ((2 * Y - X) % 3 != 0 || (2 * X - Y) % 3 != 0) {
     cout << 0 << endl;
     return 0;
   }
-
-  LL x = (2 * Y - X) / 3; LL y = Y - 2 * x;
+  int x = (2 * Y - X) / 3; int y = (2 * X - Y) / 3;
   if (x < 0 || y < 0) {
     cout << 0 << endl;
     return 0;
   }
-
   cout << combination(x + y, x) << endl;
   return 0;
 }

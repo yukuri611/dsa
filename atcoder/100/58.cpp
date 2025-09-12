@@ -3,27 +3,31 @@
 using namespace std;
 using LL = long long;
 
-LL djkstra(vector<vector<int>> &adj, set<int> zombie, set<int> &dangerous, int P, int Q) {
-  int n = adj.size() - 1;
-  vector<LL> Cost(n + 1, LLONG_MAX);
-  Cost[1] = 0;
-  priority_queue<pair<LL, int>, vector<pair<LL, int>>, greater<pair<LL,int>>> pq;
-  pq.push({0,1});
-  while (!pq.empty()) {
-    LL curr_cost = pq.top().first;
+LL Dijkstra(vector<vector<int>>&G, set<int>& Z, set<int>& D, int P, int Q) {
+  int N = G.size();
+  int dest = N - 1;
+  vector<LL> minimum_cost(N, LLONG_MAX);
+  minimum_cost[0] = 0;
+  priority_queue<pair<LL, int>, vector<pair<LL, int>>, greater<pair<LL, int>>> pq;
+  pq.push({0, 0});
+  while(!pq.empty()) {
+    LL c = pq.top().first;
     int u = pq.top().second;
     pq.pop();
-    if (u == n) {
-      if (dangerous.count(n)) return curr_cost - Q;
-      else return curr_cost - P;
+    if (minimum_cost[u] < c) continue;
+    if (u == dest) {
+      if (D.count(dest)) return c - Q;
+      else return c - P;
     }
-    if (curr_cost > Cost[u]) continue;
-    for (int v: adj[u]) {
-      if (zombie.count(v)) continue;
-      LL new_cost = (dangerous.count(v)) ? curr_cost + Q: curr_cost + P;
-      if (new_cost < Cost[v]) {
-        Cost[v] = new_cost;
-        pq.push({new_cost, v});
+    minimum_cost[u] = c;
+    for (auto v: G[u]) {
+      LL new_cost;
+      if (Z.count(v)) continue;
+      if (D.count(v)) new_cost = c + Q;
+      else new_cost = c + P;
+      if (minimum_cost[v] > new_cost) {
+        pq.push({new_cost,v});
+        minimum_cost[v] = new_cost;
       }
     }
   }
@@ -33,48 +37,37 @@ LL djkstra(vector<vector<int>> &adj, set<int> zombie, set<int> &dangerous, int P
 int main() {
   int N, M, K, S; cin >> N >> M >> K >> S;
   int P, Q; cin >> P >> Q;
-  set<int> zombie;
+  vector<vector<int>> G(N);
+  set<int> Zombie,Danger;
   for (int i = 0; i < K; ++i) {
-    int c; cin >> c;
-    zombie.insert(c);
+    int n; cin >> n;
+    n--;
+    Zombie.insert(n);
   }
-  vector<vector<int>> adj(N + 1);
   for (int i = 0; i < M; ++i) {
     int a, b; cin >> a >> b;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
+    a--; b--;
+    G[a].push_back(b);
+    G[b].push_back(a);
   }
 
-set<int> dangerous;
-vector<int> dist(N + 1, -1); // ゾンビからの最短距離を管理 (-1は未訪問)
-queue<int> q;
-
-// 全てのゾンビの町を始点としてキューに入れる
-for (int z : zombie) {
-    if (dist[z] == -1) {
-      q.push(z);
-      dist[z] = 0;
-    }
-}
-
-// マルチソースBFS
-while (!q.empty()) {
-    int u = q.front();
-    q.pop();
-
-    dangerous.insert(u); // ゾンビからS以下の距離にある町は危険
-
-    if (dist[u] == S) continue; // S本より遠くは探索しない
-
-    for (int v : adj[u]) {
-      if (dist[v] == -1) { // まだ訪れていない町なら
-        dist[v] = dist[u] + 1;
-        q.push(v);
+  queue<int> q;
+  for (int n: Zombie) q.push(n);
+  for (int s = 1; s <= S; ++s) {
+    int l = q.size();
+    for (int i = 0; i < l; ++i) {
+      int u = q.front();
+      q.pop();
+      for (int v: G[u]) {
+        if (Danger.count(v) == 0 && Zombie.count(v) == 0) {
+          q.push(v);
+          Danger.insert(v);
+        }
       }
     }
   }
 
-  LL res = djkstra(adj, zombie, dangerous, P, Q);
+  LL res = Dijkstra(G, Zombie, Danger, P, Q);
   cout << res << endl;
   return 0;
 }

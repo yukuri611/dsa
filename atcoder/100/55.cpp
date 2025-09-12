@@ -6,19 +6,16 @@ int main() {
   int N; cin >> N;
   vector<int> A(N);
   for (int i = 0; i < N; ++i) {
-    int a; cin >> a;
-    A[i] = a;
+    cin >> A[i];
+    A[i] = -A[i];
   }
 
-  vector<int> dp;
-  for (int i = N - 1; i > -1; --i) {
-    auto it = upper_bound(dp.begin(), dp.end(), A[i]);
-    if (it == dp.end()) {
-      dp.push_back(A[i]);
-    } 
-    else *it = A[i];
+  vector<int>S;
+  for (int i = 0; i < N; ++i) {
+    auto it = upper_bound(S.begin(), S.end(), A[i]);
+    if (it == S.end()) S.push_back(A[i]);
+    else *it = A[i]; 
   }
-
-  cout << dp.size() << endl;
+  cout << S.size() << endl;
   return 0;
 }
