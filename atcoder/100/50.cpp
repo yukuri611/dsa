@@ -1,67 +1,63 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-using LL = long long;
+using ll = long long;
 
 int main() {
+  #define int ll
   int N, M; cin >> N >> M;
-  if (N == 1) {
-    cout << 0 << " " << 1 << endl;
-    return 0;
+  vector<vector<pair<ll, ll>>> G(N, vector<pair<ll, ll>>(N, {-1,-1}));
+  for (int i = 0; i < M; ++i) {
+    ll s, t, d, time; cin >> s >> t >> d >> time;
+    --s; --t;
+    G[s][t] = {d,time};
+    G[t][s] = {d,time};
   }
-  vector<vector<vector<LL>>> G(N, vector<vector<LL>>(N, vector<LL>(2,-1)));
-  for (int _ = 0; _ < M; ++_) {
-    int s, t; LL d, time; cin >> s >> t >> d >> time;
-    G[s-1][t-1]= {d, time};
-    G[t-1][s-1] = {d, time};
-  } 
-
-  vector<vector<LL>> dp((1 << N), vector<LL>(N, LLONG_MAX)); //dp[S][i] = 訪問した建物の集合S、現在いる建物iの時における最短移動距離＝かかった時間
-  vector<vector<LL>> dp2((1 << N), vector<LL>(N, 0)); //dp2[S][i] = カウント
-  dp[1][0] = 0;
-  dp2[1][0] = 1;
-  for (int S = 1; S < (1 << N); ++S) {
-    if ((S & 1) == 0) continue; //店0は最初に訪問済みのはず
-    for (int j = 1; j < N; ++j) { // j = 次に訪問する建物
-      if (S & (1 << j)) continue; //jは訪問済み
-      int nextS = S | (1 << j);
-      for (int i = 0; i < N; ++i) { // i = jに移動する前にいる建物
-        if ((S & (1 << i)) == 0) continue; //建物iは集合Sにふくまれない。
-        if (dp[S][i] == LLONG_MAX) continue;//集合Sに訪問済みの時、現在地がiであることはない。
-        if (G[i][j][0] == -1) continue; //iからjに行く道がない
-        LL dist = dp[S][i] + G[i][j][0];
-        if (G[i][j][1] < dist) continue; //時間切れ
-
-        if (dp[nextS][j] > dist) {
-          dp[nextS][j] = dist;
-          dp2[nextS][j] = dp2[S][i];
-        }
-        else if (dp[nextS][j] == dist) {
-          dp2[nextS][j] += dp2[S][i];
+  
+  vector<vector<pair<ll, ll>>> dp((1 << N), vector<pair<ll, ll>>(N, {LLONG_MAX, -1})); //dp[S] = 集合S, 現在地vの時の最小移動距離, 行き方の総数
+  dp[1][0] = {0,1};
+  for (ll S = 1; S < (1 << N); ++S) {
+    for (int i = 0; i < N; ++i) {
+      if (!((S >> i) & 1)) {
+        //iはまだ訪れていない
+        ll nextS = S | (1 << i);
+        for (int j = 0; j < N; ++j) {
+          //最後に訪れたところをjとする。
+          if (dp[S][j].second == -1) continue; //jが現在地であることはない
+          if (G[j][i].first == -1) continue; //道がない
+          ll total_dist = dp[S][j].first + G[j][i].first;
+          if (total_dist > G[j][i].second) continue; //時間切れで通れない
+          if (total_dist > dp[nextS][i].first) continue; //最短経路ではない
+          if (total_dist == dp[nextS][i].first) {
+            dp[nextS][i].second += dp[S][j].second;
+          } 
+          else {
+            dp[nextS][i] = {total_dist, dp[S][j].second};
+          }
         }
       }
     }
   }
 
-  LL min_dist, count; min_dist = LLONG_MAX; count = 0;
-  for (int j = 1; j < N; ++j) { //jは一番最後に訪問した建物
-    if (G[j][0][0] == -1) continue; //jから0に戻る道がない。
-    if (dp[(1 << N) - 1][j] == LLONG_MAX) continue; //最後に訪問した建物がjであることはない。
-    LL dist = dp[(1 << N) - 1][j] + G[j][0][0];
-    if (dist > G[j][0][1]) continue; //時間切れ
-    if (min_dist > dist) {
-      min_dist = dist;
-      count = dp2[(1 << N) - 1][j];
+  ll res = LLONG_MAX;
+  ll count = -1;
+  ll mask = (1 << N) - 1;
+  for (int i = 0; i < N; ++i) {
+    if (dp[mask][i].second == -1) continue;
+    if (G[i][0].first == -1) continue; //道がない;
+    ll total_dist = dp[mask][i].first + G[i][0].first;
+    if (total_dist > G[i][0].second) continue; //時間切れで通れない
+    if (total_dist > res) continue; //最短経路ではない
+    if (total_dist == res) {
+      count += dp[mask][i].second;
+    } 
+    else {
+      res = total_dist;
+      count = dp[mask][i].second;
     }
-    else if (min_dist == dist) {
-      count += dp2[(1 << N) - 1][j];
-    }
-  }
-  if (min_dist == LLONG_MAX) {
-    cout << "IMPOSSIBLE" << endl;
-  }
-  else {
-    cout << min_dist << " " << count << endl;
-  }
+  } 
+
+  if (res == LLONG_MAX) cout << "IMPOSSIBLE" << endl;
+  else cout << res << " " << count <<  endl;
   return 0;
 }

@@ -1,41 +1,33 @@
-#include <iostream>
-#include <vector>
-#include <unordered_set>
+#include <bits/stdc++.h>
 
 using namespace std;
 
+int n, q;
+vector<int> A;
+
 int main() {
-  int n; cin >> n;
-  vector<int> A(n);
-  for (int i = 0; i < n; ++i) cin >> A[i];
-  int q; cin >> q;
-  vector<int> m(q);
-  for (int i = 0; i < q; ++i) cin >> m[i];
+  cin >> n;
+  A.resize(n);
+  for (int i = 0; i < n; ++i) {
+    cin >> A[i];
+  }
 
-  unordered_set<int> possible_sums;
-
-  //bit 探索
-  for (int j = 0; j < (1 << n); ++j) {
-    int bit[n];
-    for (int k = 0; k < n; ++k) {
-      int div = 1 << k;
-      bit[n - 1 - k] = (j / div) % 2;
-    }
+  vector<bool> sum(20 * 2000 + 1, false);
+  for (int bit = 0; bit < (1 << n); ++bit) {
     int total = 0;
     for (int i = 0; i < n; ++i) {
-      if (bit[i]) total += A[i];
+      if ((bit >> i) & 1) total += A[i];
     }
-    possible_sums.insert(total);
+    sum[total] = true;
   }
 
-  for (int m_i: m) {
-    if(possible_sums.count(m_i)) {
-      cout << "yes" << endl;
-    }
-    else {
-      cout << "no" << endl;
-    }
+  cin >> q;
+  vector<string> res_list;
+  for (int i = 0; i < q; ++i) {
+    int m; cin >> m;
+    if (sum[m]) res_list.push_back("yes");
+    else res_list.push_back("no");
   }
+  for (string s: res_list) cout << s << endl;
   return 0;
-  
 }
