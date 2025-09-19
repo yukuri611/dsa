@@ -1,36 +1,33 @@
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <climits>
-
+#include <bits/stdc++.h>
 using namespace std;
-
+using ll = long long;
 int main() {
-  int K, N; cin >> N >> K;
-  vector<long long> a(N);
-  for (int i = 0; i < N; ++i) cin >> a[i];
-  
-  long long res = LLONG_MAX;
-  for (int n = 1; n < (1 << N); ++n) {
-    vector<int> bit(N);
-    for(int i = 0; i < N; ++i) {
-      bit[i] = ((n >> i) & 1) % 2;
-    }
-    int c = count(bit.begin(), bit.end(), 1);
-    if (c != K) continue;
-    long long cost = 0;
-    long long curr_max = 0;
-    for (int i = 0; i < N; ++i) {
-      if (!bit[i] || curr_max < a[i]) {
-        curr_max = max(curr_max, a[i]);
-        continue;
-      }
-      curr_max++;
-      cost += curr_max - a[i];
-    }
-    res = min(res, cost);
+  int N, K; cin >> N >> K;
+  vector<ll> A(N);
+  for (int i = 0; i < N; ++i) {
+    cin >> A[i];
   }
 
-  cout << res << endl;
+  ll cost = LLONG_MAX;
+  for (int bit = 0; bit < (1 << N); bit++) {
+    int count = 1;
+    ll curr_cost = 0;
+    vector<ll> currA = A;
+    for (int i = 1; i < N; ++i) {
+      if ((bit >> i) & 1) {
+        //i番目の建物が見えるようにする。
+        count++;
+        if (currA[i-1] >= currA[i]) {
+          curr_cost += currA[i-1] + 1 - currA[i];
+          currA[i] = currA[i - 1] + 1;
+        }
+      }
+      currA[i] = max(currA[i], currA[i - 1]);
+    }
+    if (count < K) continue;
+    cost = min(cost, curr_cost);
+  }
+
+  cout << cost << endl;
   return 0;
 }

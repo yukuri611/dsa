@@ -1,46 +1,51 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <queue>
+#include <bits/stdc++.h>
 
 using namespace std;
-vector<int> dh = {1,0,-1,0};
-vector<int> dw = {0,1,0,-1};
+
+int H, W; 
+vector<int> dr = {0,1,0,-1};
+vector<int> dc = {1,0,-1,0};
+vector<string> S;
+vector<vector<int>> dist;
+int white_count = 0;
+
+void bfs() {
+  queue<pair<int, int>> q;
+  q.push({0,0});
+  dist[0][0] = 0;
+  while(!q.empty()) {
+    auto p = q.front();
+    q.pop();
+    int r = p.first; int c = p.second;
+    for (int i = 0; i < 4; ++i) {
+      int nr = r + dr[i]; int nc = c + dc[i];
+      if (nr < 0 || nr >= H || nc < 0 || nc >= W) continue;
+      if (S[nr][nc] == '#') continue;
+      if (dist[nr][nc] != INT_MAX) continue;
+      q.push({nr,nc});
+      dist[nr][nc] = dist[r][c] + 1;
+    }
+  }
+}
 
 int main() {
-  int H, W; cin >> H >> W;
-  vector<string> g(H);
-  int c = 0;
-  for (int h = 0; h < H; ++h) {
-    cin >> g[h];
-    c += count(g[h].begin(), g[h].end(), '#');
-  }
-
-  queue<pair<int, int>> q;
-  vector<vector<int>> dist(H, vector<int>(W,-1));
-  q.push({0,0});
-  dist[0][0] = 1;
-  while(!q.empty()) {
-    pair<int, int> p = q.front();
-    q.pop();
-    int h, w; h = p.first; w = p.second;
-    for (int i = 0; i < 4; ++i) {
-      int nh, nw; nh = h + dh[i]; nw = w + dw[i];
-      if (nh < 0 || nh >= H || nw < 0 || nw >= W) continue;
-      if (g[nh][nw] == '#') continue;
-      if (dist[nh][nw] != -1) continue; 
-      q.push({nh, nw});
-      dist[nh][nw] = dist[h][w] + 1;
+  cin >> H >> W; 
+  S.resize(H);
+  dist.resize(H, vector<int>(W, INT_MAX));
+  for (int i = 0; i < H; ++i) {
+    cin >> S[i];
+    for (int j = 0; j < W; ++j) {
+      if (S[i][j] == '.') white_count++;
     }
   }
 
-  if (dist[H-1][W-1] == -1) {
+  bfs();
+  if (dist[H-1][W-1] == INT_MAX) {
     cout << -1 << endl;
   }
   else {
-    cout << H * W - c - dist[H-1][W-1] << endl;
+    int erase_count = white_count - (dist[H - 1][W - 1] + 1);
+    cout << erase_count << endl;
   }
   return 0;
-
-
 }

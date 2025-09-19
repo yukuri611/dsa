@@ -1,82 +1,68 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-bool canAttack(const vector<vector<int>> &grid, int r, int c) {
-  for(int r_i = 0; r_i < 8; ++r_i) {
-    if (grid[r_i][c] && r_i != r) return true;    
+bool check(vector<int> qr, vector<int> qc, int r, int c) {
+  for (int i = 0; i < qr.size(); ++i) {
+    if (qr[i] == r || qc[i] == c) return false;
+    if (abs(qr[i] - r) == abs(qc[i] - c)) return false;
   }
-  for (int c_i = 0; c_i < 8; ++c_i) {
-    if (grid[r][c_i] && c_i != c) return true;
-  }
-  int r_i, c_i; r_i = r; c_i = c;
-  while (r_i < 8 && r_i > -1 && c_i < 8 && c_i > -1) {
-    if (grid[r_i][c_i] && (r_i != r || c_i != c)) return true;
-    r_i++;
-    c_i++;
-  }
-  r_i = r; c_i = c;
-  while (r_i < 8 && r_i > -1 && c_i < 8 && c_i > -1) {
-    if (grid[r_i][c_i] && (r_i != r || c_i != c)) return true;
-    r_i++;
-    c_i--;
-  }
-  r_i = r; c_i = c;
-  while (r_i < 8 && r_i > -1 && c_i < 8 && c_i > -1) {
-    if (grid[r_i][c_i] && (r_i != r || c_i != c)) return true;
-    r_i--;
-    c_i--;
-  }
-  r_i = r; c_i = c;
-  while (r_i < 8 && r_i > -1 && c_i < 8 && c_i > -1) {
-    if (grid[r_i][c_i] && (r_i != r || c_i != c)) return true;
-    r_i--;
-    c_i++;
-  }
+  return true;
+}
 
-  return false;
+void print_grid(vector<int> qr, vector<int> qc) {
+  for (int i = 0; i < 8; ++i) {
+    string S;
+    for (int j = 0; j < 8; ++j) {
+      char c = '.';
+      for (int k = 0; k < 8; ++k) {
+        if (qr[k] == i && qc[k] == j) {
+          c = 'Q';
+          break;
+        }
+      }
+      S += c;
+    }
+    cout << S << endl;
+  }
 }
 
 int main() {
   int k; cin >> k;
-  vector<vector<int>> grid(8, vector<int>(8,0));
-  vector<pair<int,int>> queens;
+  vector<int> qr(k), qc(k);
   for (int i = 0; i < k; ++i) {
-    int x, y; cin >> x >> y;
-    grid[x][y] = 1;
-    queens.push_back({x, y});
+    cin >> qr[i] >> qc[i];
   }
-  
-  vector<int> permutation = {0,1,2,3,4,5,6,7};
-  do {
-    for (int i = 0; i < 8; ++i) {
-      int r = i, c = permutation[i];
-      grid[r][c] = 1;
+  vector<int> rR;
+  vector<int> rC;
+  for (int i = 0; i < 8; ++i) {
+    bool validr = true;
+    bool validc = true;
+    for (int j = 0; j < k; ++j) {
+      if (qr[j] == i) validr = false;
+      if (qc[j] == i) validc = false;
     }
-    bool valid = true;
-    for (int r = 0; r < 8; ++r) {
-      for (int c = 0; c < 8; ++c) {
-        if (grid[r][c] && canAttack(grid, r,c)) valid = false; 
-      }
-    }
-    if (valid) break;
-    for (int i = 0; i < 8; ++i) {
-      int r = i, c = permutation[i];
-      grid[r][c] = 0;
-    }
-    for (auto queen: queens) {
-      grid[queen.first][queen.second] = 1;
-    }
-  } while(next_permutation(permutation.begin(), permutation.begin() + 8));
+    if (validr) rR.push_back(i);
+    if (validc) rC.push_back(i);
+  }
 
-  for (int r = 0; r < 8; ++r) {
-    for (int c = 0; c < 8; ++c) {
-      char res = grid[r][c] ? 'Q': '.';
-      cout << res;
+  do {
+    vector<int> curr_qr = qr;
+    vector<int> curr_qc = qc;
+    bool valid = true;
+    for (int i = 0; i < rC.size(); ++i) {
+      int r = rR[i]; int c = rC[i];
+      if (!check(curr_qr, curr_qc, r, c)) {
+        valid = false;
+        break;
+      }
+      curr_qr.push_back(r);
+      curr_qc.push_back(c);
     }
-    cout << endl;
-  }
-  return 0;
+    if (valid) {
+      print_grid(curr_qr, curr_qc);
+      return 0;
+    }
+  } while(next_permutation(rC.begin(), rC.end()));
+  
 }
