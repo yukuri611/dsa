@@ -10,20 +10,23 @@ int main() {
     cin >> A[i];
   }
 
-  ll res = 0;
-  for (int n = 0; n < N - 1; ++n) {
-    int min_s = 0;
-    for (int i = 0; i < N - (n + 1); ++i) {
-      if (A[min_s] + A[min_s + 1] > A[i] + A[i + 1]) min_s = i;
-    }
-    A[min_s] = A[min_s] + A[min_s + 1];
-    for (int i = min_s + 1; i < N - 1; ++i) {
-      A[i] = A[i + 1];
-    }
-    A.resize(N - (n + 1));
-    res += A[min_s];
+  vector<ll> sum(N + 1,0); //sum[i] = インデックス0からi-1までの和
+  for (int i = 1; i <= N; ++i){
+    sum[i] += sum[i - 1] + A[i-1];
   }
 
-  cout << res << endl;
+  vector<vector<ll>> dp(N, vector<ll>(N + 1, LLONG_MAX));
+  for (int i = 0; i < N; ++i) dp[i][i] = 0;
+
+  for (int l = 2; l <= N; ++l) {
+    for (int i = 0; i < N - l + 1; ++i) {
+      int j = i + l - 1;
+      for (int k = i; k < j; ++k) {
+        dp[i][j] = min(dp[i][j], dp[i][k] + dp[k + 1][j] + sum[j + 1] - sum[i]);
+      }
+    }
+  }
+
+  cout << dp[0][N-1] << endl;
   return 0;
 }
