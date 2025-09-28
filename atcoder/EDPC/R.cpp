@@ -4,46 +4,23 @@ using namespace std;
 using ll = long long;
 ll mod = 1e9 + 7;
 
-vector<vector<ll>> matrix_mul(vector<vector<ll>> &A, vector<vector<ll>> &B) {
-  int m = A.size(); int n = A[0].size(); int l = B[0].size();
-  vector<vector<ll>> res(m, vector<ll>(l,0));
-  for (int i = 0; i < m; ++i) {
-    for (int j = 0; j < l; ++j) {
-      for (int k = 0; k < n; ++k) {
-        res[i][j] = (res[i][j] + A[i][k] * B[k][j]) % mod;
+int main() {
+  string K; cin >> K;
+  int D; cin >> D;
+  int N = K.size();
+  vector<vector<vector<ll>>> dp(N + 1, vector<vector<ll>>(2, vector<ll>(D, 0)));
+  dp[0][0][0] = 1;
+  for (int i = 0; i < N; ++i) {
+    int currD = K[i] - '0';
+    for (int j = 0; j < 2; ++j) {
+      for (int k = 0; k < D; ++k) {
+        for (int d = 0; d <= (j ? 9 : currD); ++d) {
+          dp[i + 1][j || d < currD][(k + d) % D] = (dp[i + 1][j || d < currD][(k + d) % D] + dp[i][j][k]) % mod;
+        }
       }
     }
   }
-  return res;
-}
-vector<vector<ll>> matrix_pow(vector<vector<ll>> &A, ll K) {
-  int N = A.size();
-  vector<vector<ll>> res(N, vector<ll>(N, 0));
-  for (int i = 0; i < N; ++i) res[i][i] = 1;
-  while(K > 0) {
-    if (K & 1) res = matrix_mul(res, A);
-    A = matrix_mul(A, A);
-    K >>= 1;
-  }
-  return res;
-}
 
-int main() {
-  ll N, K; cin >> N >> K;
-  vector<vector<ll>> A(N, vector<ll>(N));
-  for (int i = 0; i < N; ++i) {
-    for (int j = 0; j < N; ++j) {
-      cin >> A[i][j];
-    }
-  }
-
-  auto A_K = matrix_pow(A, K);
-  ll res = 0;
-  for (int i = 0; i < N; ++i) {
-    for (int j = 0; j < N; ++j) {
-      res = (res + A_K[i][j]) % mod;
-    }
-  }
-  
-  cout << res << endl;
+  cout << (dp[N][0][0] + dp[N][1][0] - 1 + mod) % mod << endl;
+  return 0;
 }
