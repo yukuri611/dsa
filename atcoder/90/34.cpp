@@ -5,30 +5,26 @@ using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
 int main() {
-    // input
     int N, K;
     cin >> N >> K;
     vector<int> A(N);
     rep(i, N) cin >> A[i];
 
-    // syakutori
+    map<int, int> Map;
     int r = 0;
     int c = 0;
     int res = 0;
-    map<int, int> cnt;
     rep(l, N) {
         while (r < N) {
-            if (cnt[A[r]] == 0 && c == K) break;
-            if (cnt[A[r]] == 0) c++;
-            cnt[A[r]]++;
+            if (c == K && Map[A[r]] == 0) break;
+            if (Map[A[r]] == 0) c++;
+            Map[A[r]] += 1;
             r++;
         }
         res = max(res, r - l);
-        if (cnt[A[l]] == 1) c--;
-        cnt[A[l]]--;
+        if (Map[A[l]] == 1) c--;
+        Map[A[l]] -= 1;
     }
-
-    // output
     cout << res << endl;
     return 0;
 }

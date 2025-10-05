@@ -5,22 +5,22 @@ using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
 int main() {
-    int N; cin >> N;
+    int N;
+    cin >> N;
     vector<ll> X(N), Y(N);
     rep(i, N) cin >> X[i] >> Y[i];
 
     sort(X.begin(), X.end());
     sort(Y.begin(), Y.end());
-
-    int mid = N / 2;
-    int xt = X[mid];
-    int yt = Y[mid];
-
-    ll res = 0;
+    ll Xcenter = X[N / 2];
+    ll Ycenter = Y[N / 2];
+    ll distX = 0;
+    ll distY = 0;
     rep(i, N) {
-        res += abs(X[i] - xt);
-        res += abs(Y[i] - yt);
+        distX += abs(X[i] - Xcenter);
+        distY += abs(Y[i] - Ycenter);
     }
-    cout << res << endl;
+
+    cout << distX + distY << endl;
     return 0;
 }

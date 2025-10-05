@@ -4,56 +4,43 @@ using namespace std;
 using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
+int ans = 0;
 int H, W;
-vector<string> C;
+vector<string> S;
 vector<vector<bool>> visited;
-vector<int> dr = {0,1,0,-1};
-vector<int> dc = {1,0,-1,0};
+vector<int> dr = {1, 0, -1, 0};
+vector<int> dc = {0, 1, 0, -1};
 
-int dfs(int sr, int sc, int r, int c) {
+void dfs(int sr, int sc, int r, int c, int d) {
+    if (d != 0 && sr == r && sc == c) {
+        ans = max(ans, d);
+        return;
+    }
+    if (visited[r][c]) return;
     visited[r][c] = true;
-    int maximum = -1;
     rep(i, 4) {
         int nr = r + dr[i];
         int nc = c + dc[i];
         if (nr < 0 || nr >= H || nc < 0 || nc >= W) continue;
-        if (nr == sr && nc == sc) {
-            maximum = max(maximum, 0);
-            continue;
-        }
-        if (visited[nr][nc]) continue;
-        if (C[nr][nc] == '#') continue;
-        int curr_d = dfs(sr, sc, nr, nc);
-        if (curr_d == -1) continue;
-        maximum = max(maximum, curr_d);
+        if (S[nr][nc] == '#') continue;
+        dfs(sr, sc, nr, nc, d + 1);
     }
     visited[r][c] = false;
-    if (maximum == -1) return -1;
-    else return maximum + 1;
 }
 
 int main() {
-    //input
     cin >> H >> W;
-    C.resize(H);
-    rep(i, H) {
-        cin >> C[i];
-    }   
-    visited.assign(H, vector<bool>(W, false));
-    int ans = -1;
+    S.resize(H);
+    rep(i, H) cin >> S[i];
     rep(i, H) {
         rep(j, W) {
-            if (C[i][j] == '.') {
-                rep(k, H) rep(l, W) visited[k][l] = false;
-                ans = max(ans, dfs(i, j, i, j));
-            }
+            visited.assign(H, vector<bool>(W, false));
+            dfs(i, j, i, j, 0);
         }
     }
-    if (ans < 3) {
+    if (ans <= 2)
         cout << -1 << endl;
-    }
-    else cout << ans << endl;
+    else
+        cout << ans << endl;
     return 0;
 }
-
-

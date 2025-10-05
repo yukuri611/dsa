@@ -7,18 +7,22 @@ using ll = long long;
 double PI = acos(-1);
 
 int main() {
-    double T; cin >> T;
-    double L, X, Y; cin >> L >> X >> Y;
-    double w = (2 * PI) / T;
-    int Q; cin >> Q;
-    cout << fixed << setprecision(10);
+    ll T;
+    cin >> T;
+    ll L, X, Y;
+    cin >> L >> X >> Y;
+    int Q;
+    cin >> Q;
+    cout << fixed << setprecision(7);
     rep(_, Q) {
-        int e; cin >> e;
-        double phi = w * e;
-        double h = (L / 2) * (1 - cos(phi));
-        double a = (-L / 2) * sin(phi);
-        double theta = atan2(h, sqrt(pow(X,2) + pow(Y - a, 2)));
-        cout << (180 / PI) * theta << endl; 
+        ll E;
+        cin >> E;
+        double theta = (2 * PI) / T * E;
+        double h = (1 - cos(theta)) * L / 2;
+        double a = -(L * sin(theta)) / 2;
+        double base = sqrt(X * X + (Y - a) * (Y - a));
+        double phi = atan(h / base) * 180 / PI;
+        cout << phi << endl;
     }
     return 0;
 }

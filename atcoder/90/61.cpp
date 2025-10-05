@@ -7,6 +7,7 @@ using ll = long long;
 int main() {
     int Q;
     cin >> Q;
+
     deque<int> deq;
     rep(i, Q) {
         int t, x;
@@ -16,7 +17,8 @@ int main() {
         else if (t == 2)
             deq.push_back(x);
         else {
-            cout << deq[x - 1] << endl;
+            x--;
+            cout << deq[x] << endl;
         }
     }
     return 0;
