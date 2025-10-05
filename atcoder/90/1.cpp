@@ -1,34 +1,43 @@
 #include <bits/stdc++.h>
 
 using namespace std;
+using ll = long long;
+#define rep(i, N) for (int i = 0; i < N; ++i)
 
 int main() {
-  long long N, L; cin >> N >> L;
-  long long K; cin >> K;
-  vector<long long> A(N + 2);
-  A[0] = 0; A[N + 1] = L;
-  for (long long i = 1; i <= N; ++i) cin >> A[i];
+    int N, L;
+    cin >> N >> L;
+    int K;
+    cin >> K;
+    vector<int> A(N + 1);
+    A[0] = 0;
+    rep(i, N) cin >> A[i + 1];
 
-  long long l = 0; long long r = L;
-  while (l + 1 < r) {
-    long long mid = (r - l) / 2 + l;
-    long long i = 1;
-    long long curr = 0;
-    long long count = 0;
-    while (i < N + 2) {
-      if (curr >= mid) {
-        count++;
-        curr = 0;
-      }
-      curr += A[i] - A[i-1];
-      i++;
+    int l = -1;
+    int r = L + 1;
+    while (r - l > 1) {
+        int mid = (r - l) / 2 + l;
+        int prev = 0;
+        bool valid = true;
+        rep(j, K) {
+            int curr = prev + 1;
+            while (curr < N && A[curr] - A[prev] < mid) {
+                curr++;
+            }
+            if (curr == N + 1) {
+                valid = false;
+                break;
+            }
+            prev = curr;
+        }
+        valid = valid && (L - A[prev] >= mid);
+        if (valid) {
+            l = mid;
+        } else {
+            r = mid;
+        }
     }
-    if (curr >= mid) count++;
-    bool valid = count >= K + 1;
-    if (valid) l = mid;
-    else r = mid;
-  }
 
-  cout << l << endl;
-  return 0;
+    cout << l << endl;
+    return 0;
 }

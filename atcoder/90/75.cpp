@@ -4,25 +4,30 @@ using namespace std;
 using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
-ll count_pf(ll n) {
-    ll ans = 0;
-    double M = sqrt(n);
-    for (ll i = 2; i <= M && n > 1; ++i) {
-        while (n % i == 0) {
-            ans++;
-            n /= i;
+ll countPrimeFactor(ll N) {
+    ll res = 0;
+    ll remain = N;
+    for (ll p = 2; remain > 1 && p * p <= N; ++p) {
+        while (remain % p == 0) {
+            res++;
+            remain /= p;
         }
     }
-    if (n != 1) ans++;
-    return ans;
+    if (remain != 1) res++;
+    return res;
 }
 
 int main() {
     ll N;
     cin >> N;
-    ll pf_count = count_pf(N);
-    ll ans = 0;
-    while (pf_count > pow(2, ans)) ans++;
+
+    ll c = countPrimeFactor(N);
+    int ans = 0;
+    int curr = 1;
+    while (curr < c) {
+        ans++;
+        curr *= 2;
+    }
+
     cout << ans << endl;
-    return 0;
 }

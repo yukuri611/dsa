@@ -7,11 +7,15 @@ using ll = long long;
 int main() {
     int H, W;
     cin >> H >> W;
-    if (H < 2)
+    if (H == 1) {
         cout << W << endl;
-    else if (W < 2)
+        return 0;
+    }
+    if (W == 1) {
         cout << H << endl;
-    else
-        cout << (H / 2 + H % 2) * (W / 2 + W % 2) << endl;
-    return 0;
+        return 0;
+    } else {
+        cout << ((W + 1) / 2) * ((H + 1) / 2) << endl;
+        return 0;
+    }
 }
