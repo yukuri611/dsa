@@ -5,48 +5,51 @@ using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
 int main() {
-    ll N, K, P;
-    cin >> N >> K >> P;
+    int N, K; cin >> N >> K;
+    ll P; cin >> P;
     vector<ll> A(N);
     rep(i, N) cin >> A[i];
 
     int mid = N / 2;
-
-    vector<vector<ll>> vec1(mid + 1), vec2(N - mid + 1);
-    for (int s = 0; s < (1 << mid); ++s) {
+    vector<vector<ll>> sum1(mid + 1);
+    rep(s, (1 << mid)) {
         ll sum = 0;
         ll c = 0;
-        rep(j, mid) {
+        rep(j, (mid)) {
             if ((s >> j) & 1) {
                 sum += A[j];
                 c++;
-            }
+            }    
         }
-        if (sum <= P) vec1[c].push_back(sum);
+        sum1[c].push_back(sum);
     }
-    for (int s = 0; s < (1 << (N - mid)); ++s) {
+    vector<vector<ll>> sum2(N - mid + 1);
+    rep(s, (1 << (N - mid))) {
         ll sum = 0;
         ll c = 0;
-        rep(j, N - mid) {
+        rep(j, (N - mid)) {
             if ((s >> j) & 1) {
-                sum += A[mid + j];
+                sum += A[j + mid];
                 c++;
             }
         }
-        if (sum <= P) vec2[c].push_back(sum);
+        sum2[c].push_back(sum);
     }
 
-    rep(i, N - mid + 1) { sort(vec2[i].begin(), vec2[i].end()); }
-    ll res = 0;
-    for (int c1 = 0; c1 <= mid; ++c1) {
-        int c2 = K - c1;
-        if (c2 < 0 || c2 > (N - mid)) continue;
+    rep(i, N - mid + 1) sort(sum2[i].begin(), sum2[i].end());
 
-        for (ll sum1 : vec1[c1]) {
-            auto it = upper_bound(vec2[c2].begin(), vec2[c2].end(), P - sum1);
-            res += (it - vec2[c2].begin());
+    ll res = 0;
+    rep(c1, mid + 1) {
+        int c2 = K - c1;
+        if (c2 < 0) break;
+        if (c2 > N - mid) continue;
+        for(ll s1: sum1[c1]) {
+            auto it = upper_bound(sum2[c2].begin(), sum2[c2].end(), P - s1);
+            ll c = it - sum2[c2].begin();
+            res += c;
         }
     }
+    
     cout << res << endl;
     return 0;
 }
