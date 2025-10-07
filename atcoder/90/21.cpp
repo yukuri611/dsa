@@ -5,59 +5,56 @@ using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
 int N, M;
-vector<bool> visited;
-vector<vector<int>> G;
-vector<vector<int>> Ginv;
-vector<int> I;
 ll cnt;
-void dfs(int a) {
-    visited[a] = true;
-    for (int child : G[a]) {
-        if (!visited[child]) dfs(child);
+vector<vector<int>> G;
+vector<vector<int>> H;
+
+vector<int> mark;
+vector<bool> visited;
+
+void dfs(int u) {
+    visited[u] = true;
+    for (int v : G[u]) {
+        if (!visited[v]) dfs(v);
     }
-    I.push_back(a);
+    mark.push_back(u);
 }
 
-void dfs2(int a) {
-    visited[a] = true;
+void dfs2(int u) {
+    visited[u] = true;
     cnt++;
-    for (int child : Ginv[a]) {
-        if (!visited[child]) dfs2(child);
+    for (int v : H[u]) {
+        if (!visited[v]) dfs2(v);
     }
 }
 
 int main() {
     cin >> N >> M;
-    G.resize(N);
-    Ginv.resize(N);
+    G.resize(N + 1);
+    H.resize(N + 1);
     rep(i, M) {
         int a, b;
         cin >> a >> b;
-        a--;
-        b--;
         G[a].push_back(b);
-        Ginv[b].push_back(a);
+        H[b].push_back(a);
     }
 
-    visited.assign(N, false);
-
-    // Kosaraju's Algorithm
-    // step1. first DFS
-    rep(i, N) {
-        if (!visited[i]) dfs(i);
-    }
-    reverse(I.begin(), I.end());
-
-    // step2. second dfs
-    visited.assign(N, false);
-    ll ans = 0;
-    rep(i, N) {
-        if (visited[I[i]]) continue;
-        cnt = 0;
-        dfs2(I[i]);
-        ans += (cnt * (cnt - 1)) / 2;
+    visited.resize(N + 1, false);
+    for (int i = 1; i <= N; ++i) {
+        if (visited[i]) continue;
+        dfs(i);
     }
 
-    cout << ans << endl;
+    ll res = 0;
+    visited.assign(N + 1, false);
+    for (int i = N - 1; i >= 0; --i) {
+        if (!visited[mark[i]]) {
+            cnt = 0;
+            dfs2(mark[i]);
+            res += (cnt * (cnt - 1)) / 2;
+        }
+    }
+
+    cout << res << endl;
     return 0;
 }

@@ -5,47 +5,46 @@ using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
 struct Edge {
-    int v;
-    ll cost;
+    int v, cost;
 };
 
 vector<vector<Edge>> G;
 int N, M;
 
-vector<ll> dijkstra(int s) {
-    vector<ll> dist(N, LLONG_MAX);
-    priority_queue<pair<ll, int>, vector<pair<ll, int>>, greater<pair<ll, int>>>
+void dijkstra(int start, vector<int> &dist) {
+    priority_queue<pair<int, int>, vector<pair<int, int>>,
+                   greater<pair<int, int>>>
         pq;
-    pq.push({0, s});
-    dist[s] = 0;
+    pq.push({0, start});
     while (!pq.empty()) {
-        auto [c, u] = pq.top();
+        auto [currC, u] = pq.top();
         pq.pop();
+        if (currC > dist[u]) continue;
+        dist[u] = currC;
         for (auto [v, c] : G[u]) {
-            ll new_cost = dist[u] + c;
-            if (dist[v] > new_cost) {
-                dist[v] = new_cost;
-                pq.push({new_cost, v});
-            }
+            if (dist[v] != INT_MAX) continue;
+            int newCost = currC + c;
+            pq.push({newCost, v});
         }
     }
-    return dist;
 }
 
 int main() {
     cin >> N >> M;
-    G.resize(N);
+    G.resize(N + 1);
     rep(i, M) {
-        int a, b;
-        ll c;
+        int a, b, c;
         cin >> a >> b >> c;
-        a--;
-        b--;
         G[a].push_back({b, c});
         G[b].push_back({a, c});
     }
-    auto dist1 = dijkstra(0);      // dist from 0
-    auto dist2 = dijkstra(N - 1);  // dist to N
-    rep(k, N) { cout << dist1[k] + dist2[k] << endl; }
+
+    vector<int> dist1(N + 1, INT_MAX), distN(N + 1, INT_MAX);
+    dijkstra(1, dist1);
+    dijkstra(N, distN);
+
+    for (int k = 1; k <= N; ++k) {
+        cout << dist1[k] + distN[k] << endl;
+    }
     return 0;
 }
