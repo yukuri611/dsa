@@ -1,42 +1,48 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-vector<int> dr = {1,0,-1,0};
-vector<int> dc = {0,1,0,-1};
+using ll = long long;
+#define rep(i, n) for (int i = 0; i < (n); ++i)
 
-int dfs(vector<vector<int>> &A, int r, int c) {
-  int count = 1;
-  A[r][c] = 0;
-  for (int i = 0; i < 4; ++i) {
-    int nr = r + dr[i]; int nc = c + dc[i];
-    if (nr < 0 || nr >= A.size() || nc < 0 || nc >= A[0].size()) continue;
-    if (A[nr][nc] == 1) {
-      count = max(count, 1 + dfs(A, nr, nc));
+vector<vector<int>> G;
+vector<vector<bool>> visited;
+int H, W;
+
+vector<int> dr = {1, 0, -1, 0};
+vector<int> dc = {0, 1, 0, -1};
+
+int dfs(int r, int c) {
+    int res = 0;
+    visited[r][c] = true;
+    rep(i, 4) {
+        int nr = r + dr[i], nc = c + dc[i];
+        if (nr < 0 || nr >= H || nc < 0 || nc >= W) continue;
+        if (visited[nr][nc]) continue;
+        if (G[nr][nc] == 0) continue;
+        res = max(res, dfs(nr, nc));
     }
-  }
-  A[r][c] = 1;
-  return count;
+    visited[r][c] = false;
+    return res + 1;
 }
 
 int main() {
-  int m; cin >> m;
-  int n; cin >> n;
-  vector<vector<int>> A(n, vector<int>(m));
-  for (int i = 0; i < n; ++i) {
-    for (int j = 0; j < m; ++j) {
-      cin >> A[i][j];
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    cin >> W >> H;
+    G.resize(H, vector<int>(W));
+    rep(i, H) { rep(j, W) cin >> G[i][j]; }
+
+    visited.resize(H, vector<bool>(W));
+    int res = 0;
+    rep(i, H) {
+        rep(j, H) {
+            if (G[i][j] == 1) {
+                res = max(res, dfs(i, j));
+            }
+        }
     }
-  }
-  
-  int count = 0;
-  for (int i = 0; i < n; ++i) {
-    for (int j = 0; j < m; ++j) {
-      if (A[i][j] == 1) {
-        int curr_count = dfs(A, i, j);
-        count = max(count, curr_count);
-      }
-    }
-  }
-  cout << count << endl;
-  return 0;
+
+    cout << res << endl;
+    return 0;
 }

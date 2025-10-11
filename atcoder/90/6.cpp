@@ -10,32 +10,15 @@ int main() {
     string S;
     cin >> S;
 
-    vector<vector<int>> pos(26, vector<int>(N + 1, -1));
-    for (int i = N - 1; i >= 0; --i) {
-        rep(ch, 26) {
-            if (ch == S[i] - 'a') {
-                pos[ch][i] = i;
-            } else {
-                pos[ch][i] = pos[ch][i + 1];
-            }
-        }
-    }
+    string T;
 
-    string ans;
-    int currI = 0;
-    rep(i, K) {
-        rep(currCh, 26) {
-            if (pos[currCh][currI] == -1) {
-                continue;
-            } else if (pos[currCh][currI] > N - (K - ans.size())) {
-                continue;
-            } else {
-                currI = pos[currCh][currI] + 1;
-                ans += 'a' + currCh;
-                break;
-            }
+    rep(i, N) {
+        int currCh = S[i];
+        while (K - T.size() < N - i && T.size() > 0 && T.back() > currCh) {
+            T.pop_back();
         }
+        if (T.size() < K) T.push_back(currCh);
     }
-    cout << ans << endl;
+    cout << T << endl;
     return 0;
 }

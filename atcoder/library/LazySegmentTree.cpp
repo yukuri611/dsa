@@ -2,7 +2,7 @@
 
 using namespace std;
 using ll = long long;
-#define rep(i, N) for (int i = 0; i < N; ++i)
+#define rep(i, n) for (int i = 0; i < (n); ++i)
 
 ll INF = 1e18;
 
@@ -61,21 +61,3 @@ class LazySegmentTree {
 
     ll query(int a, int b) { return query(a, b, 0, 0, n); }
 };
-
-int main() {
-    int W, N;
-    cin >> W >> N;
-    vector<int> L(N), R(N);
-    rep(i, N) { cin >> L[i] >> R[i]; }
-
-    vector<ll> H(W + 1, 0);
-    LazySegmentTree st(H);
-    rep(i, N) {
-        int l = L[i], r = R[i];
-        int maximumHeight = st.query(l, r + 1);
-        st.update(l, r + 1, maximumHeight + 1);
-        cout << maximumHeight + 1 << endl;
-    }
-
-    return 0;
-}

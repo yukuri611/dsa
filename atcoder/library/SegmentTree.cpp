@@ -42,35 +42,3 @@ class SegmentTree {
 
     ll query(int a, int b) { return query(a, b, 0, 0, n); }
 };
-
-int main() {
-    int W, N;
-    cin >> W >> N;
-    vector<int> L(N), R(N), V(N);
-    rep(i, N) cin >> L[i] >> R[i] >> V[i];
-
-    vector<ll> dp(W + 1, -INF);
-    dp[0] = 0;
-    SegmentTree st(dp);
-
-    rep(i, N) {
-        int l = L[i], r = R[i];
-        ll v = V[i];
-        vector<ll> nextDp = dp;
-        for (int j = l; j < W + 1; ++j) {
-            ll maxValue = st.query(max(j - r, 0), j - l + 1);
-            if (maxValue == -INF) continue;
-            nextDp[j] = max(nextDp[j], maxValue + v);
-        }
-        SegmentTree nextSt(nextDp);
-        dp = nextDp;
-        st = nextSt;
-    }
-
-    ll res = dp[W];
-    if (res == -INF)
-        cout << -1 << endl;
-    else
-        cout << res << endl;
-    return 0;
-}

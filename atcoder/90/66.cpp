@@ -11,16 +11,16 @@ int main() {
     rep(i, N) cin >> L[i] >> R[i];
 
     double res = 0;
-    for (int i = 0; i < N; ++i) {
+    rep(i, N) {
         for (int j = i + 1; j < N; ++j) {
-            int cnt = 0, all = 0;
-            for (int k = L[i]; k <= R[i]; ++k) {
-                for (int l = L[j]; l <= R[j]; ++l) {
-                    if (k > l) ++cnt;
-                    ++all;
-                }
+            int divisor = 0;
+            for (int k = L[j]; k <= R[j]; ++k) {
+                int cnt = max(R[i] - k, 0);
+                cnt = min(cnt, R[i] - L[i] + 1);
+                divisor += cnt;
             }
-            res += double(cnt) / all;
+            int dividend = (R[i] - L[i] + 1) * (R[j] - L[j] + 1);
+            res += (double)divisor / dividend;
         }
     }
 
