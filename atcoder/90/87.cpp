@@ -5,22 +5,22 @@ using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
 vector<vector<ll>> A;
-int N, P, K; 
+int N, P, K;
 
 int count_number(ll lens) {
     vector<vector<ll>> dist(N, vector<ll>(N));
-    //ワーシャルフロイド法
+    // ワーシャルフロイド法
     rep(i, N) {
         rep(j, N) {
-            if (A[i][j] == -1) dist[i][j] = lens;
-            else dist[i][j] = A[i][j]; 
+            if (A[i][j] == -1)
+                dist[i][j] = lens;
+            else
+                dist[i][j] = A[i][j];
         }
     }
-    rep(k, N){
+    rep(k, N) {
         rep(i, N) {
-            rep(j, N) {
-                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
-            }
+            rep(j, N) { dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]); }
         }
     }
 
@@ -32,17 +32,18 @@ int count_number(ll lens) {
     }
     return res;
 }
- 
+
 ll get_border(ll cnts) {
-    ll l = 0, r = 5e9, minx = 5e9; 
-    while((r - l) > 1) {
+    // cntsとcnts + 1のボーダーを返す。
+    ll l = 0, r = 5e9, minx = 5e9;
+    while ((r - l) > 1) {
         ll mid = (l + r) / 2;
         int res = count_number(mid);
         if (res <= cnts) {
             r = mid;
             minx = min(minx, r);
-        }
-        else l = mid;
+        } else
+            l = mid;
     }
     return minx;
 }
