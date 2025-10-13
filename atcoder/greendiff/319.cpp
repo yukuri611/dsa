@@ -5,9 +5,9 @@ using ll = long long;
 #define rep(i, n) for (int i = 0; i < (n); ++i)
 
 const vector<vector<int>> lines = {
-    {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // 横
-    {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // 縦
-    {0, 4, 8}, {2, 4, 6}  // 斜め
+    {0, 1, 2}, {3, 4, 5}, {6, 7, 8},  // 横
+    {0, 3, 6}, {1, 4, 7}, {2, 5, 8},  // 縦
+    {0, 4, 8}, {2, 4, 6}              // 斜め
 };
 
 int main() {
@@ -25,7 +25,7 @@ int main() {
     do {
         denominator++;
         bool gakkari = false;
-        for (auto & line: lines) {
+        for (auto& line : lines) {
             int pos0, pos1, pos2;
             rep(i, 9) {
                 if (p[i] == line[0]) pos0 = i;
@@ -52,8 +52,8 @@ int main() {
             if (c1 == c2) gakkari = true;
         }
         if (!gakkari) numerator++;
-    } while(next_permutation(p.begin(), p.end()));
+    } while (next_permutation(p.begin(), p.end()));
 
-    cout <<fixed << setprecision(8) << (double) numerator / denominator << endl;
+    cout << fixed << setprecision(8) << (double)numerator / denominator << endl;
     return 0;
 }
