@@ -10,29 +10,23 @@ int main() {
 
     int N;
     cin >> N;
-    vector<vector<ll>> G(N, vector<ll>(N));
+    vector<vector<ll>> G(N, vector<ll>(N, 0));
     rep(i, N) {
-        for (int j = i + 1; j < N; ++j) {
-            int d;
-            cin >> d;
-            G[i][j] = d;
-            G[j][i] = d;
-        }
+        for (int j = i + 1; j < N; ++j) cin >> G[i][j];
     }
 
     vector<ll> dp((1 << N), 0);
 
     rep(s, (1 << N)) {
-        if (__builtin_popcount(s) % 2) continue;
-        vector<int> notUsed;
+        int l = -1;
         rep(j, N) {
-            if (!((s >> j) & 1)) notUsed.push_back(j);
+            if (!((s >> j) & 1)) {l = j; break;}
         }
 
-        rep(j, notUsed.size()) {
-            for (int k = j + 1; k < notUsed.size(); ++k) {
-                int newS = s | (1 << j) | (1 << k);
-                dp[newS] = max(dp[newS], dp[s] + G[j][k]);
+        rep(j, N) {
+            if (!(s >> j & 1)) {
+                int ns = s | (1 << l) | (1 << j);
+                dp[ns] = max(dp[ns], dp[s] + G[l][j]);
             }
         }
     }
