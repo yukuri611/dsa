@@ -12,15 +12,13 @@ int main() {
 
     sort(X.begin(), X.end());
     sort(Y.begin(), Y.end());
-    ll Xcenter = X[N / 2];
-    ll Ycenter = Y[N / 2];
-    ll distX = 0;
-    ll distY = 0;
-    rep(i, N) {
-        distX += abs(X[i] - Xcenter);
-        distY += abs(Y[i] - Ycenter);
-    }
 
-    cout << distX + distY << endl;
+    ll midX = X[N / 2];
+    ll midY = Y[N / 2];
+
+    ll res = 0;
+    rep(i, N) res += abs(X[i] - midX) + abs(Y[i] - midY);
+
+    cout << res << endl;
     return 0;
 }

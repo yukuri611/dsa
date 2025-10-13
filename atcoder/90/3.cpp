@@ -5,41 +5,35 @@ using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
 vector<vector<int>> G;
-vector<int> dist;
-int N;
 
-void dfs(int u, int prev, int d) {
-    for (int v : G[u]) {
-        if (v == prev) continue;
-        dfs(v, u, d + 1);
+pair<int, int> dfs(int cur, int prev) {
+    int dist = 0;
+    int node = 0;
+    for (int child : G[cur]) {
+        if (child == prev) continue;
+        auto [newDist, newNode] = dfs(child, cur);
+        if (dist < newDist) {
+            dist = newDist;
+            node = newNode;
+        }
     }
-    dist[u] = d;
+    if (node == 0) node = cur;
+    return {dist + 1, node};
 }
 
 int main() {
+    int N;
     cin >> N;
-    G.resize(N);
+    G.resize(N + 1);
     rep(i, N - 1) {
         int a, b;
         cin >> a >> b;
-        a--;
-        b--;
         G[a].push_back(b);
         G[b].push_back(a);
     }
 
-    dist.resize(N, 0);
-    dfs(0, -1, 1);
-    int u = 0;
-    rep(i, N) {
-        if (dist[i] < dist[u]) u = i;
-    }
-
-    fill(dist.begin(), dist.end(), 0);
-    dfs(u, -1, 1);
-    int res = dist[0];
-    rep(i, N) res = max(res, dist[i]);
-
+    int u = dfs(1, 0).second;
+    int res = dfs(u, 0).first;
     cout << res << endl;
     return 0;
 }

@@ -3,15 +3,11 @@
 using namespace std;
 using ll = long long;
 #define rep(i, n) for (int i = 0; i < (n); ++i)
-#include <bits/stdc++.h>
-
-using namespace std;
-using ll = long long;
-#define rep(i, n) for (int i = 0; i < (n); ++i) 
 
 class UnionFind {
     vector<int> parent, rank;
-public:
+
+   public:
     UnionFind(int n) : parent(n), rank(n, 0) {
         iota(parent.begin(), parent.end(), 0);
     }
@@ -26,8 +22,7 @@ public:
         if (rootA == rootB) return;
         if (rank[rootA] < rank[rootB]) {
             parent[rootA] = rootB;
-        }
-        else {
+        } else {
             parent[rootB] = rootA;
             if (rank[rootB] == rank[rootA]) {
                 rank[rootA]++;
@@ -37,36 +32,39 @@ public:
 };
 
 int main() {
-    int N, M; cin >> N >> M;
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int N, M;
+    cin >> N >> M;
     UnionFind uf(N + 1);
     rep(i, M) {
-        int u, v; cin >> u >> v;
+        int u, v;
+        cin >> u >> v;
         uf.unite(u, v);
     }
-
-    int K; cin >> K;
-    vector<int> X(K), Y(K);
-    rep(i, K) cin >> X[i] >> Y[i];
-
-    set<pair<int, int>> Set;
+    int K;
+    cin >> K;
+    vector<set<int>> vec(N + 1);
     rep(i, K) {
-        int x = X[i], y = Y[i];
+        int x, y;
+        cin >> x >> y;
         int rootX = uf.find(x), rootY = uf.find(y);
-        Set.insert({rootX, rootY});
-        Set.insert({rootY, rootX});
+        vec[rootX].insert(rootY);
+        vec[rootY].insert(rootX);
     }
+    int cnt;
+    cin >> cnt;
+    vector<int> P(cnt), Q(cnt);
+    rep(i, cnt) cin >> P[i] >> Q[i];
 
-    int Q; cin >> Q;
-    rep(i, Q) {
-        int p, q; cin >> p >> q;
+    rep(i, cnt) {
+        int p = P[i], q = Q[i];
         int rootP = uf.find(p), rootQ = uf.find(q);
-
-        if (Set.find({rootP, rootQ}) == Set.end()) {
-            cout << "Yes" << endl;
-        }
-        else {
+        if (vec[rootP].find(rootQ) != vec[rootP].end())
             cout << "No" << endl;
-        }
+        else
+            cout << "Yes" << endl;
     }
 
     return 0;

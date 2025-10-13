@@ -5,11 +5,10 @@ using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
 class UnionFind {
-    int n;
     vector<int> parent, rank;
 
    public:
-    UnionFind(int n) : n(n), parent(n), rank(n, 1) {
+    UnionFind(int n) : parent(n), rank(n, 0) {
         iota(parent.begin(), parent.end(), 0);
     }
 
@@ -25,7 +24,7 @@ class UnionFind {
             parent[rootA] = rootB;
         } else {
             parent[rootB] = rootA;
-            if (rank[rootA] == rank[rootB]) {
+            if (rank[rootB] == rank[rootA]) {
                 rank[rootA]++;
             }
         }
@@ -37,25 +36,22 @@ int main() {
     cin >> N;
     int Q;
     cin >> Q;
-    vector<int> T(Q), X(Q), Y(Q);
-    vector<ll> V(Q);
-    rep(i, Q) {
-        cin >> T[i] >> X[i] >> Y[i] >> V[i];
-        X[i]--;
-        Y[i]--;
-    }
+    vector<ll> T(Q), X(Q), Y(Q), V(Q);
+    rep(i, Q) cin >> T[i] >> X[i] >> Y[i] >> V[i];
 
-    vector<ll> sum(N - 1, 0);
+    vector<ll> sum(N, 0);
     rep(i, Q) {
         if (T[i] == 0) {
             sum[X[i]] = V[i];
         }
     }
 
-    vector<ll> potential(N, 0);
-    rep(i, N - 1) { potential[i + 1] = sum[i] - potential[i]; }
+    vector<ll> potential(N + 1, 0);
+    for (int i = 1; i < N; ++i) {
+        potential[i + 1] = sum[i] - potential[i];
+    }
 
-    UnionFind uf(N);
+    UnionFind uf(N + 1);
     rep(i, Q) {
         int t = T[i], x = X[i], y = Y[i];
         ll v = V[i];
@@ -64,15 +60,13 @@ int main() {
         } else {
             if (uf.find(x) != uf.find(y)) {
                 cout << "Ambiguous" << endl;
-                continue;
-            }
-            ll diff = V[i] - potential[X[i]];
-            if ((X[i] + Y[i]) % 2) {
-                cout << potential[Y[i]] - diff << endl;
-                continue;
             } else {
-                cout << potential[Y[i]] + diff << endl;
-                continue;
+                ll diff = v - potential[x];
+                if ((y + x) % 2) {
+                    cout << potential[y] - diff << endl;
+                } else {
+                    cout << potential[y] + diff << endl;
+                }
             }
         }
     }

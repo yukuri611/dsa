@@ -1,20 +1,31 @@
 #include <bits/stdc++.h>
+
 using namespace std;
+using ll = long long;
+#define rep(i, n) for (int i = 0; i < (n); ++i)
 
 int main() {
-  int N; cin >> N;
-  vector<int> A(N);
-  for (int i = 0; i < N; ++i) {
-    cin >> A[i];
-    A[i] = -A[i];
-  }
-  vector<int> S;
-  for (int i = 0; i < N; ++i) {
-    auto it = upper_bound(S.begin(), S.end(), A[i]);
-    if (it == S.end()) S.push_back(A[i]);
-    else *(it) = A[i];
-  }
-  cout << S.size() << endl;
-  return 0;
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
 
+    int N;
+    cin >> N;
+    vector<int> A(N);
+    rep(i, N) {
+        cin >> A[i];
+        A[i] = -A[i];
+    }
+
+    vector<int> LIS;
+    rep(i, N) {
+        auto it = upper_bound(LIS.begin(), LIS.end(), A[i]);
+        if (it == LIS.end())
+            LIS.push_back(A[i]);
+        else {
+            *it = A[i];
+        }
+    }
+
+    cout << LIS.size() << endl;
+    return 0;
 }

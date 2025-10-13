@@ -1,85 +1,82 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-using LL = long long;
+using ll = long long;
+#define rep(i, n) for (int i = 0; i < (n); ++i)
 
-struct Edge{
-  int u, v, w;
-  Edge(int u, int v, int w) : u(u), v(v), w(w) {}
-  bool operator>(const Edge& e) const{
-    return w > e.w;
-  }
+struct Edge {
+    ll cost;
+    int u, v;
+
+    bool operator<(const Edge& e) const { return cost < e.cost; }
+    bool operator>(const Edge& e) const { return cost > e.cost; }
 };
 
-class UnionFind{
-  vector<int> parent, rank;
-public:
-  UnionFind(int n) : parent(n), rank(n, 0){
-    iota(parent.begin(), parent.end(), 0);
-  }
-  int find(int a) {
-    if (parent[a] != a) parent[a] = find(parent[a]);
-    return parent[a];
-  }
+class UnionFind {
+    vector<int> parent, rank;
 
-  void unite(int a, int b) {
-    int rootA = find(a);
-    int rootB = find(b);
-    if (rootA == rootB) return;
-    if (rank[rootB] > rank[rootA]) {
-      parent[rootA] = rootB;
+   public:
+    UnionFind(int n) : parent(n), rank(n, 0) {
+        iota(parent.begin(), parent.end(), 0);
     }
-    else {
-      parent[rootB] = rootA;
-      if(rank[rootA] == rank[rootB]) {
-        rank[rootA]++;
-      }
-    }
-  }
 
-  bool same(int a, int b) {
-    return find(a) == find(b);
-  }
+    int find(int a) {
+        if (parent[a] != a) parent[a] = find(parent[a]);
+        return parent[a];
+    }
+
+    void unite(int a, int b) {
+        int rootA = find(a), rootB = find(b);
+        if (rootA == rootB) return;
+        if (rank[rootA] < rank[rootB]) {
+            parent[rootA] = rootB;
+        } else {
+            parent[rootB] = rootA;
+            if (rank[rootB] == rank[rootA]) {
+                rank[rootA]++;
+            }
+        }
+    }
 };
 
 int main() {
-  int N; cin >> N;
-  vector<int> X(N), Y(N);
-  for (int i = 0; i < N; ++i) cin >> X[i] >> Y[i];
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
 
-  priority_queue<Edge, vector<Edge>, greater<Edge>> pq;
-  vector<int> id(N);
-  //xによって追加
-  iota(id.begin(), id.end(), 0);
-  sort(id.begin(), id.end(), [&X](int i, int j){return X[i] < X[j];});
-  for (int i = 0; i < N - 1; ++i) {
-    int u = id[i]; int v= id[i + 1];
-    int w = X[v] - X[u];
-    pq.push(Edge(u,v,w));
-  }
-  //yによって追加
-  iota(id.begin(), id.end(), 0);
-  sort(id.begin(), id.end(), [&Y](int i, int j){return Y[i] < Y[j];});
-  for (int i = 0; i < N - 1; ++i) {
-    int u = id[i]; int v= id[i + 1];
-    int w = Y[v] - Y[u];
-    pq.push(Edge(u,v,w));
-  }
+    int N;
+    cin >> N;
+    vector<ll> X(N), Y(N);
+    rep(i, N) cin >> X[i] >> Y[i];
 
-  UnionFind uf(N);
-  LL res = 0;
-  int count = 0;
-  while(!pq.empty()) {
-    Edge e = pq.top();
-    pq.pop();
-    if (uf.same(e.u, e.v)) continue;
-    uf.unite(e.u, e.v);
-    res += e.w;
-    count++;
-    if (count == N-1) break;
-  }
+    vector<ll> indexX(N);
+    iota(indexX.begin(), indexX.end(), 0);
+    sort(indexX.begin(), indexX.end(),
+         [&](int i, int j) { return X[i] < X[j]; });
+    vector<ll> indexY(N);
+    iota(indexY.begin(), indexY.end(), 0);
+    sort(indexY.begin(), indexY.end(),
+         [&](int i, int j) { return Y[i] < Y[j]; });
 
-  cout << res << endl;
-  return 0;
+    priority_queue<Edge, vector<Edge>, greater<Edge>> pq;
+    rep(i, N - 1) {
+        int i1 = indexX[i], i2 = indexX[i + 1];
+        pq.push({X[i2] - X[i1], i1, i2});
+    }
+    rep(i, N - 1) {
+        int i1 = indexY[i], i2 = indexY[i + 1];
+        pq.push({Y[i2] - Y[i1], i1, i2});
+    }
 
+    UnionFind uf(N);
+    ll res = 0;
+    while (!pq.empty()) {
+        auto [cost, u, v] = pq.top();
+        pq.pop();
+        if (uf.find(u) == uf.find(v)) continue;
+        uf.unite(u, v);
+        res += cost;
+    }
+
+    cout << res << endl;
+    return 0;
 }

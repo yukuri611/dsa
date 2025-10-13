@@ -4,16 +4,16 @@ using namespace std;
 using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
-ll countPrimeFactor(ll N) {
+ll countFactor(ll n) {
     ll res = 0;
-    ll remain = N;
-    for (ll p = 2; remain > 1 && p * p <= N; ++p) {
-        while (remain % p == 0) {
+    ll curr = n;
+    for (ll i = 2; i * i <= n; ++i) {
+        while (curr % i == 0) {
+            curr /= i;
             res++;
-            remain /= p;
         }
     }
-    if (remain != 1) res++;
+    if (curr > 1) res++;
     return res;
 }
 
@@ -21,13 +21,14 @@ int main() {
     ll N;
     cin >> N;
 
-    ll c = countPrimeFactor(N);
-    int ans = 0;
-    int curr = 1;
-    while (curr < c) {
-        ans++;
+    ll cnt = countFactor(N);
+    int res = 0;
+    ll curr = 1;
+    while (curr < cnt) {
         curr *= 2;
+        res++;
     }
 
-    cout << ans << endl;
+    cout << res << endl;
+    return 0;
 }
