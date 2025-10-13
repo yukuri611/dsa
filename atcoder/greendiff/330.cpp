@@ -10,28 +10,31 @@ int main() {
 
     int N, Q;
     cin >> N >> Q;
-    vector<int> A(N + 1);
-    for (int i = 1; i <= N; ++i) cin >> A[i];
-
-    map<int, int> M;
-    set<ll> S;
-    for (int i = 1; i <= N; ++i) {
-        int a = A[i];
-        M[a]++;
-    }
-    rep(i, N + 1) {
-        if (M[i] == 0) S.insert(i);
+    vector<int> A(N);
+    rep(i, N) cin >> A[i];
+    vector<int> I(Q), X(Q);
+    rep(i, Q) {
+        cin >> I[i] >> X[i];
+        I[i]--;
     }
 
-    rep(j, Q) {
-        int i, x;
-        cin >> i >> x;
-        M[A[i]]--;
-        if (M[A[i]] == 0) S.insert(A[i]);
-        A[i] = x;
-        M[x]++;
-        if (M[x] == 1) S.erase(x);
+    map<ll, int> Map;
+    rep(i, N) Map[A[i]]++;
 
-        cout << *S.begin() << endl;
-        }
+    set<int> Set;
+    rep(i, N + 1) {  // サイズNのvector Aのmexは、最大でN。
+        if (Map[i] == 0) Set.insert(i);
+    }
+
+    rep(i, Q) {
+        Map[A[I[i]]]--;
+        if (Map[A[I[i]]] == 0) Set.insert(A[I[i]]);
+        A[I[i]] = X[i];
+        Map[X[i]]++;
+        if (Map[X[i]] == 1) Set.erase(X[i]);
+        int res = *Set.begin();
+        cout << res << endl;
+    }
+
+    return 0;
 }
