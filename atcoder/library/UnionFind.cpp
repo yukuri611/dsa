@@ -1,12 +1,7 @@
-#include <bits/stdc++.h>
-
-using namespace std;
-using ll = long long;
-#define rep(i, n) for (int i = 0; i < (n); ++i) 
-
 class UnionFind {
     vector<int> parent, rank;
-public:
+
+   public:
     UnionFind(int n) : parent(n), rank(n, 0) {
         iota(parent.begin(), parent.end(), 0);
     }
@@ -21,8 +16,7 @@ public:
         if (rootA == rootB) return;
         if (rank[rootA] < rank[rootB]) {
             parent[rootA] = rootB;
-        }
-        else {
+        } else {
             parent[rootB] = rootA;
             if (rank[rootB] == rank[rootA]) {
                 rank[rootA]++;

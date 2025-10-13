@@ -2,49 +2,46 @@
 
 using namespace std;
 using ll = long long;
-#define rep(i, n) for (int i = 0; i < n; ++i)
+#define rep(i, n) for (int i = 0; i < (n); ++i)
 
-vector<int> prime;
-int M = 300000;
+vector<int> primes;
 
-void makePrimeList() {
-    vector<bool> isPrime(M + 1, true);
-    for (int i = 2; i < M + 1; ++i) {
-        if (isPrime[i]) {
-            for (int j = 2; i * j < M + 1; ++j) {
-                isPrime[i * j] = false;
+void findPrime(ll N) {
+    vector<bool> visited(sqrt(N) + 1, false);
+    for (ll i = 2; i * i < N; ++i) {
+        if (visited[i] == false) {
+            primes.push_back(i);
+            for (ll j = 1; i * j < sqrt(N) + 1; ++j) {
+                visited[i * j] = true;
             }
         }
-    }
-
-    for (int i = 2; i < M + 1; ++i) {
-        if (isPrime[i]) prime.push_back(i);
     }
 }
 
 int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
     ll N;
     cin >> N;
+    findPrime(N);
 
-    makePrimeList();
+    sort(primes.begin(), primes.end());
+    int sz = primes.size();
 
-    int L = prime.size();
-
-    ll res = 0;
-    rep(i, L) {
-        ll a = prime[i];
-        if (a * a > N) break;
-        for (int j = i + 1; j < L; ++j) {
-            ll b = prime[j];
-            if (a * a * b > N) break;
-            ll cMax = sqrt(N / (a * a * b));
-            int k =
-                upper_bound(prime.begin(), prime.end(), cMax) - prime.begin();
-            if (k - 1 <= j) break;
-            res += (k - 1 - j);
+    int res = 0;
+    rep(i, sz) {
+        for (int j = i + 1; j < sz; ++j) {
+            ll a = primes[i], b = primes[j];
+            if (N < a * a * b) break;
+            for (int k = j + 1; k < sz; ++k) {
+                ll c = primes[k];
+                if (N < (a * a * b * c)) break;
+                if (N < (a * a * b * c * c)) break;
+                res++;
+            }
         }
     }
-
     cout << res << endl;
     return 0;
 }
