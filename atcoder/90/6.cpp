@@ -10,15 +10,15 @@ int main() {
     string S;
     cin >> S;
 
-    string T;
-
+    vector<char> ans;
     rep(i, N) {
-        int currCh = S[i];
-        while (K - T.size() < N - i && T.size() > 0 && T.back() > currCh) {
-            T.pop_back();
+        while (ans.size() > 0 && K < N - i + ans.size() && ans.back() > S[i]) {
+            ans.pop_back();
         }
-        if (T.size() < K) T.push_back(currCh);
+        ans.push_back(S[i]);
     }
-    cout << T << endl;
+    string res;
+    rep(i, K) res += ans[i];
+    cout << res << endl;
     return 0;
 }

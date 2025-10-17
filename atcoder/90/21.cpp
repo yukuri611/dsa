@@ -4,56 +4,55 @@ using namespace std;
 using ll = long long;
 #define rep(i, N) for (int i = 0; i < N; ++i)
 
-stack<int> S;
-vector<vector<int>> G, reverseG;
-vector<bool> visited;
+vector<vector<int>> G;
+vector<vector<int>> H;
 
-void dfs(int u) {
-    if (visited[u]) return;
-    visited[u] = true;
-    for (int child : G[u]) {
-        dfs(child);
+void dfs1(int curr, vector<int> &order, vector<bool> &visited) {
+    visited[curr] = true;
+    for (int nextnode : G[curr]) {
+        if (visited[nextnode]) continue;
+        dfs1(nextnode, order, visited);
     }
-    S.push(u);
+    order.push_back(curr);
 }
 
-void dfs2(int u, ll& count) {
-    if (visited[u]) return;
-    visited[u] = true;
-    count++;
-    for (int child : reverseG[u]) {
-        dfs2(child, count);
+ll dfs2(int curr, vector<bool> &visited) {
+    visited[curr] = true;
+    ll res = 1;
+    for (int nextnode : H[curr]) {
+        if (!visited[nextnode]) res += dfs2(nextnode, visited);
     }
+    return res;
 }
 
 int main() {
     int N, M;
     cin >> N >> M;
     G.resize(N + 1);
-    reverseG.resize(N + 1);
+    H.resize(N + 1);
     rep(i, M) {
         int a, b;
         cin >> a >> b;
         G[a].push_back(b);
-        reverseG[b].push_back(a);
+        H[b].push_back(a);
     }
 
-    visited.assign(N + 1, false);
+    vector<int> order;
+    vector<bool> visited(N + 1, false);
     for (int i = 1; i < N + 1; ++i) {
-        dfs(i);
+        if (!visited[i]) dfs1(i, order, visited);
     }
 
     visited.assign(N + 1, false);
-    ll res = 0;
-    while (!S.empty()) {
-        int u = S.top();
-        S.pop();
-        if (visited[u]) continue;
-        ll c = 0;
-        dfs2(u, c);
-        res += (c * (c - 1)) / 2;
-    }
+    reverse(order.begin(), order.end());
 
+    ll res = 0;
+    rep(i, N) {
+        if (!visited[order[i]]) {
+            ll c = dfs2(order[i], visited);
+            res += (c * (c - 1)) / 2;
+        }
+    }
     cout << res << endl;
     return 0;
 }
