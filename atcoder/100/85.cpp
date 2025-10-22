@@ -1,53 +1,44 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-class UnionFind{ 
-  vector<int> parent, rank;
+using ll = long long;
+#define rep(i, n) for (int i = 0; i < (n); ++i)
 
-public:
-  UnionFind(int n): parent(n), rank(n,0) {
-    iota(parent.begin(), parent.end(), 0);
-  }
+vector<ll> factors;
 
-  int find(int a) {
-    if (parent[a] != a) parent[a] = find(parent[a]);
-    return parent[a];
-  }
-
-  void unite(int a, int b) {
-    int roota = find(a);
-    int rootb = find(b);
-    if (roota == rootb) return;
-    if (rank[roota] > rank[rootb]) {
-      parent[rootb] = roota;
+void findFactor(ll n) {
+    for (ll i = 1; i * i <= n; ++i) {
+        if (n % i == 0) {
+            factors.push_back(i);
+            if (n / i != i) {
+                factors.push_back(n / i);
+            }
+        }
     }
-    else {
-      parent[roota] = rootb;
-      if (rank[roota] == rank[rootb]) {
-        rank[rootb]+= 1;
-      }
-    }
-  }
-
-  bool same(int a, int b) {
-    return find(a) == find(b);
-  }
-};
+}
 
 int main() {
-  int n, q; cin >> n >> q;
-  UnionFind uf(n);
-  vector<int>res_list;
-  for (int i = 1; i <= q; ++i) {
-    int com, x, y; cin >> com >> x >> y;
-    if (com) {
-      if (uf.same(x,y)) res_list.push_back(1);
-      else res_list.push_back(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    ll K;
+    cin >> K;
+    findFactor(K);
+    sort(factors.begin(), factors.end());
+
+    int sz = factors.size();
+    ll res = 0;
+    rep(i, sz) {
+        for (int j = i; j < sz; ++j) {
+            ll a = factors[i], b = factors[j];
+            if (K / a < b) continue;
+            if (K % (a * b) != 0) continue;
+            ll c = K / (a * b);
+            if (c < b) continue;
+            res++;
+        }
     }
-    else {
-      uf.unite(x, y);
-    }
-  }
-  for (int res : res_list) cout << res << endl;
-  return 0;
+
+    cout << res << endl;
+    return 0;
 }

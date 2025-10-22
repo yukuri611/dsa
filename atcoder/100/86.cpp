@@ -1,65 +1,44 @@
 #include <bits/stdc++.h>
 
 using namespace std;
+using ll = long long;
+#define rep(i, n) for (int i = 0; i < (n); ++i)
 
-class UnionFind{
-  vector<int> parent, rank;
-
-public:
-  UnionFind(int n) : parent(n + 1), rank(n + 1, 0) {
-    iota(parent.begin(), parent.end(), 0);
-  }
-
-  int find(int n) {
-    if (parent[n] != n) parent[n] = find(parent[n]);
-    return parent[n]; 
-  }
-
-  void unite(int a, int b) {
-    int rootA = find(a);
-    int rootB = find(b);
-    if (rootA == rootB) return;
-    if (rank[rootB] > rank[rootA]) {
-      parent[rootA] = rootB;
-    }
-    else {
-      parent[rootB] = rootA;
-      if (rank[rootB] == rank[rootA]) {
-        rank[rootA]++;
-      }
-    }
-  }
-
-  bool same(int a, int b) {
-    return find(a) == find(b);
-  }
-};
+ll mod = 1e9 + 7;
 
 int main() {
-  int N, M;
-  cin >> N >> M;
-  vector<pair<int,int>> edge(M);
-  for (int i = 0; i < M; ++i) {
-    int a, b; cin >> a >> b;
-    edge[i] = {a,b};
-  }
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
 
-  int res = 0;
+    int N, Q;
+    cin >> N >> Q;
 
-  for (int remove = 0; remove < M; ++remove) {
-    UnionFind uf(N);
-    for (int i = 0; i < M; ++i) {
-      if (i == remove) continue;
-      int a, b; a = edge[i].first; b = edge[i].second;
-      uf.unite(a,b);
+    vector<int> X(Q), Y(Q), Z(Q);
+    vector<ll> W(Q);
+    rep(i, Q) {
+        cin >> X[i] >> Y[i] >> Z[i] >> W[i];
+        X[i]--;
+        Y[i]--;
+        Z[i]--;
     }
-    for (int i = 2; i <= N; ++i) {
-      if (!uf.same(1, i)) {
-        res += 1;
-        break;
-      }
+
+    ll res = 1;
+    rep(i, 60) {
+        ll cnt = 0;
+        rep(s, 1 << N) {
+            bool valid = true;
+            rep(j, Q) {
+                if ((((s >> X[j]) & 1) | ((s >> Y[j]) & 1) |
+                     ((s >> Z[j]) & 1)) != ((W[j] >> i) & 1)) {
+                    valid = false;
+                }
+            }
+            if (valid) cnt++;
+        }
+        res *= cnt;
+        res %= mod;
     }
-  }
-  cout << res << endl;
-  return 0;
+
+    cout << res << endl;
+    return 0;
 }
