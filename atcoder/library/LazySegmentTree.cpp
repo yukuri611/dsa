@@ -2,7 +2,7 @@ ll INF = 1e18;
 
 class LazySegmentTree {
     int n;
-    vector<int> node, lazy;
+    vector<ll> node, lazy;
 
     void eval(int k, int l, int r) {
         if (lazy[k] == 0) return;
@@ -51,7 +51,7 @@ class LazySegmentTree {
             node[i] = max(node[2 * i + 1], node[2 * i + 2]);
     }
 
-    void update(int a, int b, int x) { update(a, b, x, 0, 0, n); }
+    void update(int a, int b, ll x) { update(a, b, x, 0, 0, n); }
 
     ll query(int a, int b) { return query(a, b, 0, 0, n); }
 };
