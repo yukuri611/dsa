@@ -8,25 +8,24 @@ int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-    ll N, M, C;
-    cin >> N >> M >> C;
-    vector<ll> A(N);
+    int N;
+    cin >> N;
+    vector<int> A(N);
     rep(i, N) cin >> A[i];
-    sort(A.begin(), A.end());
-    rep(i, N) A.push_back(A[i] + M);
 
     int r = 0;
+    ll cur_sum = 0;
     ll res = 0;
-    ll px = A[N - 1] - M;
-
     rep(l, N) {
-        while (r < 2 * N && (r - l < C || A[r - 1] == A[r])) {
+        while (r < N && ((cur_sum + A[r]) == (cur_sum ^ A[r]))) {
+            cur_sum += A[r];
             r++;
         }
-
-        res += (A[l] - px) * (r - l);
-        px = A[l];
+        res += r - l;
+        if (r == l) r++;
+        cur_sum -= A[l];
     }
 
     cout << res << endl;
+    return 0;
 }
