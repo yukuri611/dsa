@@ -1,32 +1,27 @@
 #include <bits/stdc++.h>
 
-#include <atcoder/all>
 using namespace std;
-using namespace atcoder;
 using ll = long long;
 #define rep(i, n) for (int i = 0; i < n; ++i)
 
 int main() {
     int N, M;
     cin >> N >> M;
-    vector<ll> P(M);
-    rep(i, M) {
-        cin >> P[i];
-        P[i]--;
-    }
+    vector<int> P(M);
+    rep(i, M) cin >> P[i];
+    rep(i, M) P[i]--;
     vector<ll> A(N - 1), B(N - 1), C(N - 1);
-    rep(i, N - 1) { cin >> A[i] >> B[i] >> C[i]; }
+    rep(i, N - 1) cin >> A[i] >> B[i] >> C[i];
 
-    vector<ll> S(N);
+    vector<int> S(N - 1, 0);
     rep(i, M - 1) {
-        int u = P[i];
-        int v = P[i + 1];
-        if (v < u) swap(u, v);
-        S[u]++;
-        S[v]--;
+        int cur = P[i], nxt = P[i + 1];
+        if (cur > nxt) swap(cur, nxt);
+        S[cur]++;
+        S[nxt]--;
     }
 
-    rep(i, N - 1) S[i + 1] += S[i];
+    rep(i, N - 2) { S[i + 1] += S[i]; }
 
     ll res = 0;
     rep(i, N - 1) { res += min(A[i] * S[i], B[i] * S[i] + C[i]); }
