@@ -1,55 +1,52 @@
 #include <bits/stdc++.h>
 
+#include <atcoder/all>
 using namespace std;
+using namespace atcoder;
 using ll = long long;
-#define rep(i, n) for (int i = 0; i < (n); ++i)
-
-const ll INF = 1e14;
+#define rep(i, n) for (int i = 0; i < n; ++i)
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-
-    ll N, M, P;
-    cin >> N >> M >> P;
-
-    vector<tuple<int, int, ll>> Edges(M);
+    int N, M;
+    cin >> N >> M;
+    vector<vector<pair<int, ll>>> G(N);
     rep(i, M) {
-        ll a, b, c;
+        int a, b, c;
         cin >> a >> b >> c;
         a--;
         b--;
-        c = -c + P;
-        Edges[i] = {a, b, c};
+        c = -c;
+        G[a].push_back({b, c});
     }
 
-    // ベルマンフォード
-    vector<ll> dist(N, INF);
+    // 最短経路を求める（ベルマンフォード）
+    vector<ll> dist(N, LLONG_MAX);
     dist[0] = 0;
     rep(i, N - 1) {
-        for (auto [a, b, c] : Edges) {
-            if (dist[a] == INF) continue;
-            dist[b] = min(dist[b], dist[a] + c);
-        }
-    }
-
-    // ループの存在を調べる
-    rep(i, N) {
-        for (auto [a, b, c] : Edges) {
-            if (dist[a] == INF) continue;
-            if (dist[a] == -INF || dist[b] > dist[a] + c) {
-                dist[b] = -INF;
+        rep(u, N) {
+            if (dist[u] == LLONG_MAX) continue;
+            for (auto [v, c] : G[u]) {
+                dist[v] = min(dist[v], dist[u] + c);
             }
         }
     }
 
-    if (dist[N - 1] == -INF) {
-        cout << -1 << endl;
-    } else {
-        ll res = max(0LL, -dist[N - 1]);
-
-        cout << res << endl;
+    // 負閉路の存在をチェック
+    vector<ll> dist_copy = dist;
+    rep(i, N) {
+        rep(u, N) {
+            if (dist[u] == LLONG_MAX) continue;
+            for (auto [v, c] : G[u]) {
+                dist_copy[v] = min(dist_copy[v], dist_copy[u] + c);
+            }
+        }
     }
 
+    if (dist[N - 1] != dist_copy[N - 1]) {
+        cout << "inf" << endl;
+        return 0;
+    }
+
+    cout << -dist[N - 1] << endl;
     return 0;
 }

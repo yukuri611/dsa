@@ -243,54 +243,46 @@ struct lazy_segtree {
 
 }  // namespace atcoder
 
-// ここまでAClibrary
-
 using namespace std;
 using namespace atcoder;
 using ll = long long;
 #define rep(i, n) for (int i = 0; i < n; ++i)
 
-struct S {
-    int value;
-    int size;
-};
-
+using S = int;
 using F = int;
-const int ID = int(2e9);
-
-S op(S a, S b) { return {a.value + b.value, a.size + b.size}; }
-
-S e() { return {0, 0}; }
-
+S op(S a, S b) { return min(a, b); }
+S e() { return INT_MAX; }
 S mapping(F f, S x) {
-    if (f != ID) x.value = x.size * f;
-    return x;
+    if (f != -1)
+        return f;
+    else
+        return x;
 }
-
-F composition(F f, F g) { return (f == ID ? g : f); }
-
-F id() { return ID; }
+F composition(F f, F g) {
+    if (f != -1)
+        return f;
+    else
+        return g;
+}
+F id() { return -1; }
 
 int main() {
     int n, q;
     cin >> n >> q;
-    vector<S> v(n, {0, 1});
-    lazy_segtree<S, op, e, F, mapping, composition, id> seg(v);
-
+    lazy_segtree<S, op, e, F, mapping, composition, id> seg(n);
     rep(i, q) {
-        int type;
-        cin >> type;
-        if (type == 0) {
+        int com;
+        cin >> com;
+        if (com == 0) {
             int s, t, x;
             cin >> s >> t >> x;
-            seg.apply(s, t + 1, (F)x);
+            seg.apply(s, t + 1, x);
         } else {
             int s, t;
             cin >> s >> t;
-            S ans = seg.prod(s, t + 1);
-            cout << ans.value << endl;
+            int res = seg.prod(s, t + 1);
+            cout << res << endl;
         }
     }
-
     return 0;
 }
