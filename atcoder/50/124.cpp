@@ -9,21 +9,24 @@ using ll = long long;
 int main() {
     int N, G, E;
     cin >> N >> G >> E;
-    vector<int> P(G);
+    vector<int> P(N);
     rep(i, G) cin >> P[i];
 
-    mf_graph<int> graph(N + 1);
-
+    mf_graph<int> Graph(N + 1);
     rep(i, E) {
         int a, b;
         cin >> a >> b;
-        graph.add_edge(a, b, 1);
-        graph.add_edge(b, a, 1);
+        Graph.add_edge(a, b, 1);
+        Graph.add_edge(b, a, 1);
     }
-    for (auto p : P) {
-        graph.add_edge(p, N, 1);
+    rep(i, G) {
+        Graph.add_edge(P[i], N, 1);
+        Graph.add_edge(N, P[i], 1);
     }
 
-    cout << graph.flow(0, N) << endl;
+    int s = 0, t = N;
+    int ans = Graph.flow(s, t);
+
+    cout << ans << endl;
     return 0;
 }

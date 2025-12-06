@@ -7,53 +7,44 @@ using ll = long long;
 #define rep(i, n) for (int i = 0; i < n; ++i)
 
 struct S {
-    ll Y, X;
+    ll X, Y;
 };
-
-S op(S a, S b) { return {max(b.Y, a.Y + b.X), a.X + b.X}; }
-
-S e() { return {0, 0}; }
+S op(S a, S b) { return {a.X + b.X, max(a.Y + b.X, b.Y)}; }
+S e() { return {0, (ll)-4e18}; }
 
 int main() {
     ll Q, K;
     cin >> Q >> K;
-    vector<ll> Com(Q), D(Q), A(Q, -1);
-
+    vector<ll> Com(Q), D(Q), A(Q);
     rep(i, Q) {
         cin >> Com[i];
-        cin >> D[i];
-        if (Com[i] == 1) cin >> A[i];
+        if (Com[i] == 1)
+            cin >> D[i] >> A[i];
+        else
+            cin >> D[i];
     }
 
-    auto D_uni = D;
-    D_uni.push_back(0);
-    sort(D_uni.begin(), D_uni.end());
-    D_uni.erase(unique(D_uni.begin(), D_uni.end()), D_uni.end());
+    auto D_id = D;
+    D_id.push_back(0);
+    sort(D_id.begin(), D_id.end());
+    D_id.erase(unique(D_id.begin(), D_id.end()), D_id.end());
 
-    int ds = D_uni.size() - 1;
-    vector<S> vec(ds);
-    rep(i, ds) {
-        ll len = D_uni[i + 1] - D_uni[i];
-        vec[i] = {0, len * K};
-    }
+    int sz = D_id.size();
+
+    vector<S> vec(sz - 1);
+    rep(i, sz - 1) { vec[i] = {(D_id[i + 1] - D_id[i]) * K, 0}; }
     segtree<S, op, e> seg(vec);
     vector<ll> res_list;
     rep(i, Q) {
-        int com = Com[i];
-        int idx = lower_bound(D_uni.begin(), D_uni.end(), D[i]) - D_uni.begin();
-        int seg_idx = idx - 1;
-
-        if (com == 1) {
+        int d = lower_bound(D_id.begin(), D_id.end(), D[i]) - D_id.begin();
+        int seg_idx = d - 1;
+        if (Com[i] == 1) {
             ll a = A[i];
-            S cur = seg.get(seg_idx);
-            cur.X -= a;
-            // cur.Yは常に0(∵Yは葉ノード)
-            seg.set(seg_idx, cur);
+            auto [cur_x, cur_y] = seg.get(seg_idx);
+            seg.set(seg_idx, {cur_x - a, cur_y});
         } else {
-            S node = seg.prod(0, seg_idx + 1);
-            ll total_prod = (D[i] * K);
-            ll Z = max(node.Y, node.X);
-            res_list.push_back(total_prod - Z);
+            auto [x, y] = seg.prod(0, seg_idx + 1);
+            res_list.push_back(D[i] * K - max(y, x));
         }
     }
 

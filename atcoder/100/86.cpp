@@ -1,44 +1,32 @@
 #include <bits/stdc++.h>
 
+#include <atcoder/all>
+using namespace atcoder;
 using namespace std;
 using ll = long long;
-#define rep(i, n) for (int i = 0; i < (n); ++i)
 
-ll mod = 1e9 + 7;
+#define rep(i, n) for (int i = 0; i < n; ++i)
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-
-    int N, Q;
-    cin >> N >> Q;
-
-    vector<int> X(Q), Y(Q), Z(Q);
-    vector<ll> W(Q);
-    rep(i, Q) {
-        cin >> X[i] >> Y[i] >> Z[i] >> W[i];
-        X[i]--;
-        Y[i]--;
-        Z[i]--;
+    int N, M;
+    cin >> N >> M;
+    vector<int> A(M), B(M);
+    rep(i, M) {
+        cin >> A[i] >> B[i];
+        A[i]--;
+        B[i]--;
     }
 
-    ll res = 1;
-    rep(i, 60) {
-        ll cnt = 0;
-        rep(s, 1 << N) {
-            bool valid = true;
-            rep(j, Q) {
-                if ((((s >> X[j]) & 1) | ((s >> Y[j]) & 1) |
-                     ((s >> Z[j]) & 1)) != ((W[j] >> i) & 1)) {
-                    valid = false;
-                }
-            }
-            if (valid) cnt++;
+    int ans = 0;
+    rep(bridge, M) {
+        dsu uf(N);
+        rep(i, M) {
+            if (i == bridge) continue;
+            uf.merge(A[i], B[i]);
         }
-        res *= cnt;
-        res %= mod;
+        int a = A[bridge], b = B[bridge];
+        if (!uf.same(a, b)) ans++;
     }
-
-    cout << res << endl;
+    cout << ans << endl;
     return 0;
 }

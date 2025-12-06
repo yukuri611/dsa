@@ -1,44 +1,53 @@
 #include <bits/stdc++.h>
-
 using namespace std;
 using ll = long long;
-#define rep(i, n) for (int i = 0; i < (n); ++i)
+#define rep(i, n) for (int i = 0; i < n; ++i)
 
-vector<ll> factors;
+class UnionFind {
+    vector<int> d;  //
 
-void findFactor(ll n) {
-    for (ll i = 1; i * i <= n; ++i) {
-        if (n % i == 0) {
-            factors.push_back(i);
-            if (n / i != i) {
-                factors.push_back(n / i);
-            }
-        }
+   public:
+    UnionFind(int n) { d.resize(n, -1); }
+
+    int find(int a) {
+        if (d[a] < 0) return a;
+        return d[a] = find(d[a]);
     }
-}
 
+    void unite(int a, int b) {
+        int rootA = find(a), rootB = find(b);
+        if (rootA == rootB) return;
+        if (-d[rootA] < -d[rootB]) {
+            swap(rootA, rootB);
+        }
+        d[rootA] += d[rootB];
+        d[rootB] = rootA;
+    }
+
+    bool same(int a, int b) { return find(a) == find(b); }
+    int size(int a) { return -d[find(a)]; }
+};
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    int n, q;
+    cin >> n >> q;
 
-    ll K;
-    cin >> K;
-    findFactor(K);
-    sort(factors.begin(), factors.end());
-
-    int sz = factors.size();
-    ll res = 0;
-    rep(i, sz) {
-        for (int j = i; j < sz; ++j) {
-            ll a = factors[i], b = factors[j];
-            if (K / a < b) continue;
-            if (K % (a * b) != 0) continue;
-            ll c = K / (a * b);
-            if (c < b) continue;
-            res++;
+    UnionFind uf(n);
+    vector<bool> res_list;
+    rep(i, q) {
+        int com, x, y;
+        cin >> com >> x >> y;
+        if (com == 0) {
+            uf.unite(x, y);
+        } else {
+            res_list.push_back(uf.same(x, y));
         }
     }
 
-    cout << res << endl;
+    for (auto res : res_list) {
+        if (res)
+            cout << 1 << endl;
+        else
+            cout << 0 << endl;
+    }
     return 0;
 }
